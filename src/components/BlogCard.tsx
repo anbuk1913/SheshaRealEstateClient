@@ -22,11 +22,12 @@ export const BlogCard = ({ blog }: Props) => (
     <div className="aspect-video overflow-hidden bg-gray-100">
       {blog.coverImage ? (
         <img
-          src={blog.coverImage}
+          src={`${import.meta.env.VITE_BASE_URL}${blog.coverImage}`}
           alt={blog.title}
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
+
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100 text-amber-300 text-4xl font-bold">
           {blog.title.charAt(0)}

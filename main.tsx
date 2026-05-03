@@ -14,6 +14,8 @@ import Dashboard        from './src/pages/admin/Dashboard';
 import ManageProperties from './src/pages/admin/ManageProperties';
 import ManageBlogs      from './src/pages/admin/ManageBlogs';
 import ManageContent    from './src/pages/admin/ManageContent';
+import ManageLocations  from './src/pages/admin/ManageLocations';   // ← new
+import ManageCategories from './src/pages/admin/ManageCategories';  // ← new
 
 import './src/index.css';
 
@@ -30,11 +32,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/blog"             element={<Blog />} />
           <Route path="/contact"          element={<Contact />} />
 
-          {/* Admin — Dashboard handles its own auth/login */}
+          {/* Admin */}
           <Route path="/admin"                    element={<Dashboard />} />
           <Route path="/admin/properties"         element={<ManageProperties />} />
           <Route path="/admin/blogs"              element={<ManageBlogs />} />
           <Route path="/admin/content"            element={<ManageContent />} />
+          <Route path="/admin/locations"          element={<ManageLocations />} />   {/* ← new */}
+          <Route path="/admin/categories"         element={<ManageCategories />} />  {/* ← new */}
         </Routes>
       </BrowserRouter>
     </Provider>

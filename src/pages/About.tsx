@@ -82,7 +82,7 @@ export default function About() {
             <h2 className="text-2xl font-bold text-white mb-4">Ready to Find Your Dream Property?</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-white/90 text-sm">
               <a href="tel:+919876543210" className="flex items-center gap-2 hover:text-white"><Phone size={15} /> +91 98765 43210</a>
-              <a href="mailto:hello@sheshaestates.in" className="flex items-center gap-2 hover:text-white"><Mail size={15} /> hello@sheshaestates.in</a>
+              <a href="mailto:shesharealestatesolutions@gmail.com" className="flex items-center gap-2 hover:text-white"><Mail size={15} /> shesharealestatesolutions@gmail.com</a>
               <span className="flex items-center gap-2"><MapPin size={15} /> Hyderabad, Telangana</span>
             </div>
           </div>

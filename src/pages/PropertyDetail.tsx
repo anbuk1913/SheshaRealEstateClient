@@ -104,7 +104,7 @@ export default function PropertyDetail() {
                 <a href="tel:+919876543210" className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 rounded-xl text-sm transition-colors">
                   <Phone size={15} /> Call Us
                 </a>
-                <a href="mailto:hello@sheshaestates.in" className="w-full flex items-center justify-center gap-2 border border-gray-200 hover:border-amber-300 text-gray-700 font-medium py-3 rounded-xl text-sm transition-colors">
+                <a href="mailto:shesharealestatesolutions@gmail.com" className="w-full flex items-center justify-center gap-2 border border-gray-200 hover:border-amber-300 text-gray-700 font-medium py-3 rounded-xl text-sm transition-colors">
                   <Mail size={15} /> Email Us
                 </a>
               </div>

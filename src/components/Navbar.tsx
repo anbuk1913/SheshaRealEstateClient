@@ -30,12 +30,13 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
+            {/* <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <Building2 size={18} className="text-white" />
             </div>
             <span className="font-bold text-gray-900 text-lg tracking-tight">
               Shesha<span className="text-amber-500">Estates</span>
-            </span>
+            </span> */}
+            <img src="/img/Logo.png" alt="" height={50} width={50} />
           </Link>
 
           {/* Desktop links */}

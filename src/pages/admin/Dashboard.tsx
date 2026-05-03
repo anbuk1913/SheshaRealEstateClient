@@ -3,12 +3,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import { logout, loginAsync } from '../../features/auth/authSlice';
-import { Building2, LayoutDashboard, Newspaper, Settings, LogOut, Menu, X } from 'lucide-react';
+import { Building2, LayoutDashboard, Newspaper, Settings, LogOut, Menu, X, MapPin, Tag } from 'lucide-react'; // ← add MapPin, Tag
 
 const navItems = [
   { to: '/admin',            label: 'Dashboard',  icon: LayoutDashboard },
   { to: '/admin/properties', label: 'Properties', icon: Building2 },
   { to: '/admin/blogs',      label: 'Blogs',      icon: Newspaper },
+  { to: '/admin/locations',  label: 'Locations',  icon: MapPin },   // ← new
+  { to: '/admin/categories', label: 'Categories', icon: Tag },       // ← new
   { to: '/admin/content',    label: 'Content',    icon: Settings },
 ];
 
@@ -23,10 +25,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex bg-gray-50">
       <aside className={`${collapsed ? 'w-16' : 'w-56'} bg-gray-900 text-white flex flex-col transition-all duration-200 shrink-0`}>
         <div className="flex items-center gap-3 px-4 py-5 border-b border-gray-800">
-          <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center shrink-0">
-            <Building2 size={16} />
-          </div>
-          {!collapsed && <span className="font-bold text-sm">Shesha Admin</span>}
+          <img src="/img/Logo.png" alt="" height={50} width={50} />
         </div>
         <nav className="flex-1 py-4 space-y-1 px-2">
           {navItems.map(({ to, label, icon: Icon }) => {
@@ -123,11 +122,13 @@ export default function Dashboard() {
       <div className="p-8">
         <h1 className="text-2xl font-semibold text-gray-900 mb-2">Welcome back 👋</h1>
         <p className="text-gray-500 text-sm mb-8">Manage your real estate platform from here.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { label: 'Properties', to: '/admin/properties', icon: Building2,  color: 'bg-amber-50 text-amber-600' },
-            { label: 'Blogs',      to: '/admin/blogs',      icon: Newspaper,  color: 'bg-blue-50 text-blue-600' },
-            { label: 'Content',    to: '/admin/content',    icon: Settings,   color: 'bg-emerald-50 text-emerald-600' },
+            { label: 'Properties', to: '/admin/properties', icon: Building2, color: 'bg-amber-50 text-amber-600' },
+            { label: 'Blogs',      to: '/admin/blogs',      icon: Newspaper, color: 'bg-blue-50 text-blue-600' },
+            { label: 'Locations',  to: '/admin/locations',  icon: MapPin,    color: 'bg-rose-50 text-rose-600' },    // ← new
+            { label: 'Categories', to: '/admin/categories', icon: Tag,       color: 'bg-violet-50 text-violet-600' },// ← new
+            { label: 'Content',    to: '/admin/content',    icon: Settings,  color: 'bg-emerald-50 text-emerald-600' },
           ].map(({ label, to, icon: Icon, color }) => (
             <Link key={to} to={to} className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-amber-200 hover:shadow-sm transition-all flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>

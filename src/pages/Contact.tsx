@@ -33,7 +33,7 @@ export default function Contact() {
             <div className="lg:col-span-2 space-y-4">
               {[
                 { icon: Phone,   label: 'Phone',   value: '+91 98765 43210',          href: 'tel:+919876543210' },
-                { icon: Mail,    label: 'Email',   value: 'hello@sheshaestates.in',   href: 'mailto:hello@sheshaestates.in' },
+                { icon: Mail,    label: 'Email',   value: 'shesharealestatesolutions@gmail.com',   href: 'mailto:shesharealestatesolutions@gmail.com' },
                 { icon: MapPin,  label: 'Address', value: '123 Shesha Towers, Banjara Hills, Hyderabad — 500034', href: '#' },
                 { icon: Clock,   label: 'Hours',   value: 'Mon–Sat: 9AM – 7PM', href: '#' },
               ].map(({ icon: Icon, label, value, href }) => (
