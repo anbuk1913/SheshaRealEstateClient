@@ -15,8 +15,7 @@ export const PropertyCard = ({ property }: Props) => (
     className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
     <div className="relative overflow-hidden aspect-[4/3]">
       <img
-        src={property.images[0] || '/placeholder.jpg'}
-        alt={property.title}
+        src={`${import.meta.env.VITE_BASE_URL}${property.images[0]}` || '/placeholder.jpg'}
         loading="lazy"
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
@@ -34,7 +33,7 @@ export const PropertyCard = ({ property }: Props) => (
     </div>
     <div className="p-5">
       <p className="text-xl font-semibold text-gray-900 mb-1">
-        ₹{property.price.toLocaleString('en-IN')}
+        {/* ₹{property.price.toLocaleString('en-IN')} */}
       </p>
       <h3 className="text-base text-gray-700 font-medium mb-3 line-clamp-2">
         {property.title}

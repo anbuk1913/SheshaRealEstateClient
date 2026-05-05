@@ -214,7 +214,7 @@ export default function ManageProperties() {
     });
     // Map existing server images into ImageEntry list
     const existing: ImageEntry[] = (p.images ?? []).map((url: string) => ({
-      id: url, preview: url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL}${url}`,
+      id: url, preview: url.startsWith('http') ? url : `${import.meta.env.VITE_BASE_URL}${url}`,
       file: null, existing: true, serverUrl: url,
     }));
     setImages(existing);
@@ -339,11 +339,11 @@ export default function ManageProperties() {
 
                 {/* Price + Area */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
+                  {/* <div>
                     <label className="text-xs font-medium text-gray-500 mb-1 block">Price (₹)</label>
                     <input required type="number" value={form.price} onChange={e => setForm(f => ({...f, price: e.target.value}))}
                       className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="0"/>
-                  </div>
+                  </div> */}
                   <div>
                     <label className="text-xs font-medium text-gray-500 mb-1 block">Area (sq ft)</label>
                     <input type="number" value={form.area} onChange={e => setForm(f => ({...f, area: e.target.value}))}
@@ -352,7 +352,7 @@ export default function ManageProperties() {
                 </div>
 
                 {/* Bedrooms + Bathrooms */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 mb-1 block">Bedrooms</label>
                     <input type="number" value={form.bedrooms} onChange={e => setForm(f => ({...f, bedrooms: e.target.value}))}
@@ -363,7 +363,7 @@ export default function ManageProperties() {
                     <input type="number" value={form.bathrooms} onChange={e => setForm(f => ({...f, bathrooms: e.target.value}))}
                       className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="0"/>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Location + Category */}
                 <div className="grid grid-cols-2 gap-4">
@@ -416,7 +416,7 @@ export default function ManageProperties() {
                   <div className="grid grid-cols-3 gap-3">
                     {images.map((img, i) => (
                       <div key={img.id} className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50" style={{ aspectRatio: '16/9' }}>
-                        <img src={img.preview} alt="" className="w-full h-full object-cover"/>
+                        <img src={`${img.preview}`} alt="" className="w-full h-full object-cover"/>
                         <div className="absolute top-1.5 right-1.5 flex gap-1">
                           <button type="button" onClick={() => handleRecrop(i)}
                             className="bg-white/90 hover:bg-white rounded-lg p-1 shadow-sm">
@@ -466,7 +466,6 @@ export default function ManageProperties() {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 text-left">
                 <th className="px-5 py-3.5 font-medium">Title</th>
-                <th className="px-5 py-3.5 font-medium">Price</th>
                 <th className="px-5 py-3.5 font-medium">Status</th>
                 <th className="px-5 py-3.5 font-medium">Featured</th>
                 <th className="px-5 py-3.5 font-medium text-right">Actions</th>
@@ -482,13 +481,12 @@ export default function ManageProperties() {
                 : properties.map(p => (
                     <tr key={p._id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-5 py-4 font-medium text-gray-800 max-w-xs truncate">{p.title}</td>
-                      <td className="px-5 py-4 text-gray-600">₹{p.price?.toLocaleString('en-IN')}</td>
                       <td className="px-5 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${p.status === 'available' ? 'bg-green-100 text-green-700' : p.status === 'sold' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
                           {p.status}
                         </span>
                       </td>
-                      <td className="px-5 py-4 text-gray-600">{p.featured ? '✓' : '—'}</td>
+                      <td className="px-5 py-4 text-gray-600">{p.featured ? '✓' : 'X'}</td>
                       <td className="px-5 py-4 flex justify-end gap-2">
                         <button onClick={() => openEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"><Pencil size={14}/></button>
                         <button onClick={() => handleDelete(p._id)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors"><Trash2 size={14}/></button>
