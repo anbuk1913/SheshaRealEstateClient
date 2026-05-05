@@ -7,18 +7,18 @@ import api from '../utils/axios';
 import { MapPin, BedDouble, Bath, Maximize2, ArrowLeft, Phone, Mail } from 'lucide-react';
 
 export default function PropertyDetail() {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
 
   useEffect(() => {
-    if (!slug) return;
+    if (!id) return;
     setLoading(true);
-    (api.get(`/properties/${slug}`) as any)
+    (api.get(`/properties/${id}`) as any)
       .then((res: any) => { setProperty(res.data); setLoading(false); })
       .catch(() => { setError('Property not found.'); setLoading(false); });
-  }, [slug]);
+  }, [id]);
 
   if (loading) return (
     <div className="min-h-screen flex flex-col">
@@ -63,7 +63,7 @@ export default function PropertyDetail() {
                   </span>
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{property.title}</h1>
-                <p className="text-3xl font-bold text-amber-500">₹{property.price?.toLocaleString('en-IN')}</p>
+                {/* <p className="text-3xl font-bold text-amber-500">₹{property.price?.toLocaleString('en-IN')}</p> */}
               </div>
 
               <div className="flex items-center gap-1.5 text-gray-500 text-sm">
@@ -72,8 +72,8 @@ export default function PropertyDetail() {
               </div>
 
               <div className="flex flex-wrap gap-6 py-4 border-y border-gray-100">
-                <span className="flex items-center gap-2 text-sm text-gray-600"><BedDouble size={16} className="text-amber-500" /> {property.bedrooms} Bedrooms</span>
-                <span className="flex items-center gap-2 text-sm text-gray-600"><Bath size={16} className="text-amber-500" /> {property.bathrooms} Bathrooms</span>
+                {/* <span className="flex items-center gap-2 text-sm text-gray-600"><BedDouble size={16} className="text-amber-500" /> {property.bedrooms} Bedrooms</span>
+                <span className="flex items-center gap-2 text-sm text-gray-600"><Bath size={16} className="text-amber-500" /> {property.bathrooms} Bathrooms</span> */}
                 <span className="flex items-center gap-2 text-sm text-gray-600"><Maximize2 size={16} className="text-amber-500" /> {property.area} sq ft</span>
               </div>
 

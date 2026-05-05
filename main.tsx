@@ -27,7 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           {/* Public */}
           <Route path="/"                 element={<Home />} />
           <Route path="/properties"       element={<Properties />} />
-          <Route path="/properties/:slug" element={<PropertyDetail />} />
+          <Route path="/properties/:id" element={<PropertyDetail />} />
           <Route path="/about"            element={<About />} />
           <Route path="/blog"             element={<Blog />} />
           <Route path="/contact"          element={<Contact />} />

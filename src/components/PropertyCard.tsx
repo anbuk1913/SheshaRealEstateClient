@@ -6,12 +6,12 @@ interface Props {
     slug: string; title: string; price: number;
     images: string[]; location: { city: string; area: string };
     bedrooms: number; bathrooms: number; area: number;
-    status: string; featured: boolean;
+    status: string; featured: boolean; _id: string;
   };
 }
 
 export const PropertyCard = ({ property }: Props) => (
-  <Link to={`/properties/${property.slug}`}
+  <Link to={`/properties/${property._id}`}
     className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
     <div className="relative overflow-hidden aspect-[4/3]">
       <img

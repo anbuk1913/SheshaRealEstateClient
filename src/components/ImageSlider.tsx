@@ -26,7 +26,7 @@ export const ImageSlider = ({ images, alt = 'Property image' }: Props) => {
       {images.map((src, i) => (
         <img
           key={i}
-          src={src}
+          src={`${import.meta.env.VITE_BASE_URL}${src}`}
           alt={`${alt} ${i + 1}`}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === current ? 'opacity-100' : 'opacity-0'}`}
         />

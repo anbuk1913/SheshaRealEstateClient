@@ -77,12 +77,7 @@ export const Navbar = () => {
                 </button>
               </>
             ) : (
-              <Link
-                to="/admin"
-                className="bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-              >
-                Admin Login
-              </Link>
+              <></>
             )}
           </div>
 
@@ -125,13 +120,7 @@ export const Navbar = () => {
               <LogOut size={16} /> Logout
             </button>
           ) : (
-            <Link
-              to="/admin"
-              onClick={() => setOpen(false)}
-              className="block w-full text-center mt-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
-            >
-              Admin Login
-            </Link>
+            <></>
           )}
         </div>
       )}
