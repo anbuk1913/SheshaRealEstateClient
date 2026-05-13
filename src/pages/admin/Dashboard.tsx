@@ -15,11 +15,17 @@ const navItems = [
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => window.innerWidth < 768);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((s: RootState) => s.auth);
+
+  useEffect(() => {
+    const handleResize = () => setCollapsed(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -43,7 +49,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <button onClick={() => { dispatch(logout()); navigate('/'); }}
             className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-gray-400 hover:bg-red-900/40 hover:text-red-400 transition-colors">
             <LogOut size={16} className="shrink-0" />
-            {!collapsed && <span>Logou rsdvt</span>}
+            {!collapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>

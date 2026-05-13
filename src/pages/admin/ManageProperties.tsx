@@ -57,38 +57,48 @@ function CropModal({ src, onDone, onCancel }: {
     setCrop({ x: b.x + (b.w - w) / 2, y: b.y + (b.h - h) / 2, w, h });
   }, [getImgBounds]);
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    if (!crop) return; e.preventDefault(); setDragging(true);
+  // ── Unified pointer handlers for DRAG ──
+  const onDragPointerDown = (e: React.PointerEvent) => {
+    if (!crop) return;
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setDragging(true);
     dragStart.current = { mx: e.clientX, my: e.clientY, cx: crop.x, cy: crop.y };
   };
 
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!dragging || !dragStart.current || !crop) return;
-      const dx = e.clientX - dragStart.current.mx, dy = e.clientY - dragStart.current.my;
-      setCrop(prev => prev ? clampCrop({ ...prev, x: dragStart.current!.cx + dx, y: dragStart.current!.cy + dy }) : prev);
-    };
-    const onUp = () => setDragging(false);
-    window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
-    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-  }, [dragging, crop, clampCrop]);
+  const onDragPointerMove = (e: React.PointerEvent) => {
+    if (!dragging || !dragStart.current || !crop) return;
+    const dx = e.clientX - dragStart.current.mx;
+    const dy = e.clientY - dragStart.current.my;
+    setCrop(prev => prev
+      ? clampCrop({ ...prev, x: dragStart.current!.cx + dx, y: dragStart.current!.cy + dy })
+      : prev
+    );
+  };
 
-  const onResizeDown = (e: React.MouseEvent) => {
-    if (!crop) return; e.stopPropagation(); e.preventDefault(); setResizing(true);
+  const onDragPointerUp = () => setDragging(false);
+
+  // ── Unified pointer handlers for RESIZE ──
+  const onResizePointerDown = (e: React.PointerEvent) => {
+    if (!crop) return;
+    e.stopPropagation();
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setResizing(true);
     resizeDragStart.current = { mx: e.clientX, my: e.clientY, cw: crop.w };
   };
 
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!resizing || !resizeDragStart.current || !crop) return;
-      const dx = e.clientX - resizeDragStart.current.mx;
-      const newW = resizeDragStart.current.cw + dx;
-      setCrop(prev => prev ? clampCrop({ ...prev, w: newW, h: newW / CROP_RATIO }) : prev);
-    };
-    const onUp = () => setResizing(false);
-    window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
-    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-  }, [resizing, crop, clampCrop]);
+  const onResizePointerMove = (e: React.PointerEvent) => {
+    if (!resizing || !resizeDragStart.current || !crop) return;
+    const dx = e.clientX - resizeDragStart.current.mx;
+    const newW = resizeDragStart.current.cw + dx;
+    setCrop(prev => prev
+      ? clampCrop({ ...prev, w: newW, h: newW / CROP_RATIO })
+      : prev
+    );
+  };
+
+  const onResizePointerUp = () => setResizing(false);
 
   const handleConfirm = () => {
     if (!crop || !imgRef.current) return;
@@ -98,7 +108,10 @@ function CropModal({ src, onDone, onCancel }: {
     const srcW = crop.w * scaleX,          srcH = crop.h * scaleY;
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(srcW); canvas.height = Math.round(srcH);
-    canvas.getContext('2d')!.drawImage(img, Math.round(srcX), Math.round(srcY), Math.round(srcW), Math.round(srcH), 0, 0, canvas.width, canvas.height);
+    canvas.getContext('2d')!.drawImage(img,
+      Math.round(srcX), Math.round(srcY), Math.round(srcW), Math.round(srcH),
+      0, 0, canvas.width, canvas.height
+    );
     canvas.toBlob(blob => { if (blob) onDone(blob); }, 'image/jpeg', 0.92);
   };
 
@@ -112,30 +125,47 @@ function CropModal({ src, onDone, onCancel }: {
           </div>
           <button onClick={onCancel} className="p-1 rounded-lg hover:bg-gray-100"><X size={15}/></button>
         </div>
-        <div ref={containerRef} className="relative select-none rounded-xl bg-gray-900 overflow-hidden">
+        <div ref={containerRef} className="relative select-none rounded-xl bg-gray-900 overflow-hidden touch-none">
           <img ref={imgRef} src={src} onLoad={initCrop} draggable={false}
             className="block mx-auto" style={{ maxHeight: '55vh', maxWidth: '100%' }} />
           {crop && (
             <>
+              {/* Dimmed overlay regions */}
               <div className="absolute pointer-events-none bg-black/55" style={{ top: 0, left: 0, right: 0, height: crop.y }}/>
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y + crop.h, left: 0, right: 0, bottom: 0 }}/>
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y, left: 0, width: crop.x, height: crop.h }}/>
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y, left: crop.x + crop.w, right: 0, height: crop.h }}/>
-              <div onMouseDown={onMouseDown} className="absolute border-2 border-white"
-                style={{ left: crop.x, top: crop.y, width: crop.w, height: crop.h, cursor: 'move' }}>
+
+              {/* Crop box — drag to move */}
+              <div
+                onPointerDown={onDragPointerDown}
+                onPointerMove={onDragPointerMove}
+                onPointerUp={onDragPointerUp}
+                className="absolute border-2 border-white touch-none"
+                style={{ left: crop.x, top: crop.y, width: crop.w, height: crop.h, cursor: dragging ? 'grabbing' : 'grab' }}
+              >
+                {/* Grid lines */}
                 {[1/3, 2/3].map(f => (
                   <div key={f} className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-0 bottom-0 border-l border-white/30" style={{ left: `${f*100}%` }}/>
                     <div className="absolute left-0 right-0 border-t border-white/30" style={{ top: `${f*100}%` }}/>
                   </div>
                 ))}
-                {['top-0 left-0 border-t-2 border-l-2','top-0 right-0 border-t-2 border-r-2','bottom-0 left-0 border-b-2 border-l-2','bottom-0 right-0 border-b-2 border-r-2'].map((cls,i) => (
+                {/* Corner accents */}
+                {['top-0 left-0 border-t-2 border-l-2','top-0 right-0 border-t-2 border-r-2','bottom-0 left-0 border-b-2 border-l-2','bottom-0 right-0 border-b-2 border-r-2'].map((cls, i) => (
                   <div key={i} className={`absolute w-4 h-4 border-amber-400 ${cls} -m-0.5`}/>
                 ))}
-                <div onMouseDown={onResizeDown}
-                  className="absolute bottom-0 right-0 w-5 h-5 bg-amber-400 rounded-tl-md cursor-se-resize flex items-center justify-center"
-                  style={{ marginBottom: -2, marginRight: -2 }}>
-                  <svg width="8" height="8" viewBox="0 0 8 8"><path d="M1 7L7 1M4 7L7 4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                {/* Resize handle — bottom-right corner */}
+                <div
+                  onPointerDown={onResizePointerDown}
+                  onPointerMove={onResizePointerMove}
+                  onPointerUp={onResizePointerUp}
+                  className="absolute bottom-0 right-0 w-7 h-7 bg-amber-400 rounded-tl-md cursor-se-resize flex items-center justify-center touch-none"
+                  style={{ marginBottom: -2, marginRight: -2 }}
+                >
+                  <svg width="8" height="8" viewBox="0 0 8 8">
+                    <path d="M1 7L7 1M4 7L7 4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
                 </div>
               </div>
             </>
