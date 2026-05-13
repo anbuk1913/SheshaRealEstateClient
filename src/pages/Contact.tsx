@@ -32,7 +32,7 @@ export default function Contact() {
             {/* Contact Info */}
             <div className="lg:col-span-2 space-y-4">
               {[
-                { icon: Phone,   label: 'Phone',   value: '+91 98765 43210',          href: 'tel:+919876543210' },
+                { icon: Phone,   label: 'Phone',   value: '+91 63792 52638',          href: 'tel:+916379252638' },
                 { icon: Mail,    label: 'Email',   value: 'shesharealestatesolutions@gmail.com',   href: 'mailto:shesharealestatesolutions@gmail.com' },
                 { icon: MapPin,  label: 'Address', value: '123 Shesha Towers, Banjara Hills, Hyderabad — 500034', href: '#' },
                 { icon: Clock,   label: 'Hours',   value: 'Mon–Sat: 9AM – 7PM', href: '#' },
@@ -76,7 +76,7 @@ export default function Contact() {
                         <label className="block text-xs font-medium text-gray-500 mb-1.5">Phone</label>
                         <input value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))}
                           className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 transition-colors"
-                          placeholder="+91 98765 43210" />
+                          placeholder="+91 63792 52638" />
                       </div>
                     </div>
                     <div>

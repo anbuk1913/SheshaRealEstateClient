@@ -101,7 +101,7 @@ export default function PropertyDetail() {
               <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-20 space-y-4">
                 <h3 className="font-semibold text-gray-900">Interested in this property?</h3>
                 <p className="text-sm text-gray-500">Get in touch with our team for more details or to schedule a visit.</p>
-                <a href="tel:+919876543210" className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 rounded-xl text-sm transition-colors">
+                <a href="tel:+916379252638" className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 rounded-xl text-sm transition-colors">
                   <Phone size={15} /> Call Us
                 </a>
                 <a href="mailto:shesharealestatesolutions@gmail.com" className="w-full flex items-center justify-center gap-2 border border-gray-200 hover:border-amber-300 text-gray-700 font-medium py-3 rounded-xl text-sm transition-colors">

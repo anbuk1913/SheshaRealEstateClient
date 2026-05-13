@@ -275,8 +275,8 @@ export default function About() {
                 Reach out - we're here to guide you every step of the way.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-white/90 text-sm">
-                <a href="tel:+919876543210" className="flex items-center gap-2 hover:text-white transition-colors">
-                  <Phone size={15} /> +91 98765 43210
+                <a href="tel:+916379252638" className="flex items-center gap-2 hover:text-white transition-colors">
+                  <Phone size={15} /> +91 63792 52638
                 </a>
                 <a href="mailto:shesharealestatesolutions@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
                   <Mail size={15} /> shesharealestatesolutions@gmail.com
