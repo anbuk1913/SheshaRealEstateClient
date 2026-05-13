@@ -10,11 +10,11 @@ import { Pencil, Trash2, Plus, X, ImagePlus, Check, CropIcon } from 'lucide-reac
 interface CropBox { x: number; y: number; w: number; h: number }
 
 interface ImageEntry {
-  id:        string;          // local unique id
-  preview:   string;          // object URL or existing server URL
-  file:      File | null;     // null = existing server image
-  existing:  boolean;         // true = already on server
-  serverUrl: string | null;   // original server path if existing
+  id:        string;
+  preview:   string;
+  file:      File | null;
+  existing:  boolean;
+  serverUrl: string | null;
 }
 
 interface SelectOption { _id: string; name?: string; city?: string; area?: string; }
@@ -57,7 +57,6 @@ function CropModal({ src, onDone, onCancel }: {
     setCrop({ x: b.x + (b.w - w) / 2, y: b.y + (b.h - h) / 2, w, h });
   }, [getImgBounds]);
 
-  // ── Unified pointer handlers for DRAG ──
   const onDragPointerDown = (e: React.PointerEvent) => {
     if (!crop) return;
     e.preventDefault();
@@ -65,39 +64,24 @@ function CropModal({ src, onDone, onCancel }: {
     setDragging(true);
     dragStart.current = { mx: e.clientX, my: e.clientY, cx: crop.x, cy: crop.y };
   };
-
   const onDragPointerMove = (e: React.PointerEvent) => {
     if (!dragging || !dragStart.current || !crop) return;
-    const dx = e.clientX - dragStart.current.mx;
-    const dy = e.clientY - dragStart.current.my;
-    setCrop(prev => prev
-      ? clampCrop({ ...prev, x: dragStart.current!.cx + dx, y: dragStart.current!.cy + dy })
-      : prev
-    );
+    setCrop(prev => prev ? clampCrop({ ...prev, x: dragStart.current!.cx + (e.clientX - dragStart.current!.mx), y: dragStart.current!.cy + (e.clientY - dragStart.current!.my) }) : prev);
   };
-
   const onDragPointerUp = () => setDragging(false);
 
-  // ── Unified pointer handlers for RESIZE ──
   const onResizePointerDown = (e: React.PointerEvent) => {
     if (!crop) return;
-    e.stopPropagation();
-    e.preventDefault();
+    e.stopPropagation(); e.preventDefault();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setResizing(true);
     resizeDragStart.current = { mx: e.clientX, my: e.clientY, cw: crop.w };
   };
-
   const onResizePointerMove = (e: React.PointerEvent) => {
     if (!resizing || !resizeDragStart.current || !crop) return;
-    const dx = e.clientX - resizeDragStart.current.mx;
-    const newW = resizeDragStart.current.cw + dx;
-    setCrop(prev => prev
-      ? clampCrop({ ...prev, w: newW, h: newW / CROP_RATIO })
-      : prev
-    );
+    const newW = resizeDragStart.current.cw + (e.clientX - resizeDragStart.current.mx);
+    setCrop(prev => prev ? clampCrop({ ...prev, w: newW, h: newW / CROP_RATIO }) : prev);
   };
-
   const onResizePointerUp = () => setResizing(false);
 
   const handleConfirm = () => {
@@ -105,75 +89,61 @@ function CropModal({ src, onDone, onCancel }: {
     const img = imgRef.current, b = getImgBounds(); if (!b) return;
     const scaleX = img.naturalWidth / b.w, scaleY = img.naturalHeight / b.h;
     const srcX = (crop.x - b.x) * scaleX, srcY = (crop.y - b.y) * scaleY;
-    const srcW = crop.w * scaleX,          srcH = crop.h * scaleY;
+    const srcW = crop.w * scaleX, srcH = crop.h * scaleY;
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(srcW); canvas.height = Math.round(srcH);
-    canvas.getContext('2d')!.drawImage(img,
-      Math.round(srcX), Math.round(srcY), Math.round(srcW), Math.round(srcH),
-      0, 0, canvas.width, canvas.height
-    );
+    canvas.getContext('2d')!.drawImage(img, Math.round(srcX), Math.round(srcY), Math.round(srcW), Math.round(srcH), 0, 0, canvas.width, canvas.height);
     canvas.toBlob(blob => { if (blob) onDone(blob); }, 'image/jpeg', 0.92);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl p-4 shadow-2xl w-full max-w-2xl">
-        <div className="flex items-center justify-between mb-3">
+    // ── Full-screen on mobile, card on sm+ ──
+    <div className="fixed inset-0 bg-black/70 z-[60] flex flex-col items-center justify-center p-0 sm:p-4">
+      <div className="bg-white sm:rounded-2xl p-4 shadow-2xl w-full sm:max-w-2xl h-full sm:h-auto flex flex-col">
+        <div className="flex items-center justify-between mb-3 shrink-0">
           <div>
             <span className="font-semibold text-gray-900 text-sm">Crop Image</span>
             <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">16 : 9</span>
           </div>
-          <button onClick={onCancel} className="p-1 rounded-lg hover:bg-gray-100"><X size={15}/></button>
+          <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={15}/></button>
         </div>
-        <div ref={containerRef} className="relative select-none rounded-xl bg-gray-900 overflow-hidden touch-none">
+        <div ref={containerRef} className="relative select-none sm:rounded-xl bg-gray-900 overflow-hidden touch-none flex-1 sm:flex-none">
           <img ref={imgRef} src={src} onLoad={initCrop} draggable={false}
-            className="block mx-auto" style={{ maxHeight: '55vh', maxWidth: '100%' }} />
+            className="block mx-auto w-full object-contain" style={{ maxHeight: '55vh' }}/>
           {crop && (
             <>
-              {/* Dimmed overlay regions */}
               <div className="absolute pointer-events-none bg-black/55" style={{ top: 0, left: 0, right: 0, height: crop.y }}/>
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y + crop.h, left: 0, right: 0, bottom: 0 }}/>
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y, left: 0, width: crop.x, height: crop.h }}/>
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y, left: crop.x + crop.w, right: 0, height: crop.h }}/>
-
-              {/* Crop box — drag to move */}
               <div
-                onPointerDown={onDragPointerDown}
-                onPointerMove={onDragPointerMove}
-                onPointerUp={onDragPointerUp}
+                onPointerDown={onDragPointerDown} onPointerMove={onDragPointerMove} onPointerUp={onDragPointerUp}
                 className="absolute border-2 border-white touch-none"
                 style={{ left: crop.x, top: crop.y, width: crop.w, height: crop.h, cursor: dragging ? 'grabbing' : 'grab' }}
               >
-                {/* Grid lines */}
                 {[1/3, 2/3].map(f => (
                   <div key={f} className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-0 bottom-0 border-l border-white/30" style={{ left: `${f*100}%` }}/>
                     <div className="absolute left-0 right-0 border-t border-white/30" style={{ top: `${f*100}%` }}/>
                   </div>
                 ))}
-                {/* Corner accents */}
                 {['top-0 left-0 border-t-2 border-l-2','top-0 right-0 border-t-2 border-r-2','bottom-0 left-0 border-b-2 border-l-2','bottom-0 right-0 border-b-2 border-r-2'].map((cls, i) => (
-                  <div key={i} className={`absolute w-4 h-4 border-amber-400 ${cls} -m-0.5`}/>
+                  <div key={i} className={`absolute w-5 h-5 border-amber-400 ${cls} -m-0.5`}/>
                 ))}
-                {/* Resize handle — bottom-right corner */}
                 <div
-                  onPointerDown={onResizePointerDown}
-                  onPointerMove={onResizePointerMove}
-                  onPointerUp={onResizePointerUp}
-                  className="absolute bottom-0 right-0 w-7 h-7 bg-amber-400 rounded-tl-md cursor-se-resize flex items-center justify-center touch-none"
+                  onPointerDown={onResizePointerDown} onPointerMove={onResizePointerMove} onPointerUp={onResizePointerUp}
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-amber-400 rounded-tl-md cursor-se-resize flex items-center justify-center touch-none"
                   style={{ marginBottom: -2, marginRight: -2 }}
                 >
-                  <svg width="8" height="8" viewBox="0 0 8 8">
-                    <path d="M1 7L7 1M4 7L7 4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
+                  <svg width="8" height="8" viewBox="0 0 8 8"><path d="M1 7L7 1M4 7L7 4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
                 </div>
               </div>
             </>
           )}
         </div>
-        <div className="flex gap-3 justify-end mt-4">
-          <button onClick={onCancel} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
-          <button onClick={handleConfirm} className="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-xl flex items-center gap-1.5">
+        <div className="flex gap-3 mt-4 shrink-0">
+          <button onClick={onCancel} className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
+          <button onClick={handleConfirm} className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-xl flex items-center justify-center gap-1.5">
             <Check size={14}/> Apply Crop
           </button>
         </div>
@@ -200,21 +170,20 @@ export default function ManageProperties() {
   const [editTarget, setEditTarget] = useState<any>(null);
   const [saving, setSaving]         = useState(false);
 
-  const [form, setForm]   = useState(emptyForm());
-  const [images, setImages] = useState<ImageEntry[]>([]);   // all images (existing + new)
-  const [cropSrc, setCropSrc]   = useState<string | null>(null);
-  const [cropIndex, setCropIndex] = useState<number | null>(null); // which slot is being cropped
+  const [form, setForm]     = useState(emptyForm());
+  const [images, setImages] = useState<ImageEntry[]>([]);
+  const [cropSrc, setCropSrc]     = useState<string | null>(null);
+  const [cropIndex, setCropIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [locations,   setLocations]   = useState<SelectOption[]>([]);
-  const [categories,  setCategories]  = useState<SelectOption[]>([]);
+  const [locations,  setLocations]  = useState<SelectOption[]>([]);
+  const [categories, setCategories] = useState<SelectOption[]>([]);
 
   useEffect(() => { if (!token) navigate('/admin'); }, [token, navigate]);
 
-  // Load dropdown options
   useEffect(() => {
-    api.get('/locations').then((r: any)   => setLocations(r.data?.data  ?? r.data ?? [])).catch(() => {});
-    api.get('/categories').then((r: any)  => setCategories(r.data?.data ?? r.data ?? [])).catch(() => {});
+    api.get('/locations').then((r: any)  => setLocations(r.data?.data  ?? r.data ?? [])).catch(() => {});
+    api.get('/categories').then((r: any) => setCategories(r.data?.data ?? r.data ?? [])).catch(() => {});
   }, []);
 
   const load = async () => {
@@ -226,12 +195,8 @@ export default function ManageProperties() {
 
   useEffect(() => { if (token) load(); }, [token]);
 
-  // ── Open create ──
-  const openCreate = () => {
-    setForm(emptyForm()); setImages([]); setEditTarget(null); setShowForm(true);
-  };
+  const openCreate = () => { setForm(emptyForm()); setImages([]); setEditTarget(null); setShowForm(true); };
 
-  // ── Open edit ──
   const openEdit = (p: any) => {
     setForm({
       title: p.title ?? '', description: p.description ?? '',
@@ -242,7 +207,6 @@ export default function ManageProperties() {
       featured: p.featured ?? false, isNewProject: p.isNewProject ?? false,
       amenities: (p.amenities ?? []).join(', '),
     });
-    // Map existing server images into ImageEntry list
     const existing: ImageEntry[] = (p.images ?? []).map((url: string) => ({
       id: url, preview: url.startsWith('http') ? url : `${import.meta.env.VITE_BASE_URL}${url}`,
       file: null, existing: true, serverUrl: url,
@@ -252,10 +216,8 @@ export default function ManageProperties() {
     setShowForm(true);
   };
 
-  // ── File picked → open crop ──
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]; if (!file) return;
-    // Add a placeholder slot, remember its index
     const newEntry: ImageEntry = {
       id: `pending-${Date.now()}`, preview: URL.createObjectURL(file),
       file, existing: false, serverUrl: null,
@@ -269,7 +231,6 @@ export default function ManageProperties() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // ── Crop done → replace slot with cropped file ──
   const handleCropDone = (blob: Blob) => {
     if (cropIndex === null) return;
     const croppedFile = new File([blob], `image-${Date.now()}.jpg`, { type: 'image/jpeg' });
@@ -280,39 +241,21 @@ export default function ManageProperties() {
     setCropSrc(null); setCropIndex(null);
   };
 
-  // ── Re-crop existing slot ──
-  const handleRecrop = (index: number) => {
-    setCropIndex(index);
-    setCropSrc(images[index].preview);
-  };
+  const handleRecrop  = (index: number) => { setCropIndex(index); setCropSrc(images[index].preview); };
+  const removeImage   = (index: number) => setImages(prev => prev.filter((_, i) => i !== index));
 
-  // ── Remove image slot ──
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // ── Submit ──
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true);
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => fd.append(k, String(v)));
-      fd.append('amenities', JSON.stringify(
-        form.amenities.split(',').map(s => s.trim()).filter(Boolean)
-      ));
-
-      // New files
+      fd.append('amenities', JSON.stringify(form.amenities.split(',').map(s => s.trim()).filter(Boolean)));
       images.filter(img => !img.existing && img.file).forEach(img => fd.append('images', img.file!));
-
-      // Existing server URLs to keep
-      const kept = images.filter(img => img.existing).map(img => img.serverUrl!);
-      fd.append('existingImages', JSON.stringify(kept));
-
+      fd.append('existingImages', JSON.stringify(images.filter(img => img.existing).map(img => img.serverUrl!)));
       if (editTarget) await api.put(`/properties/${editTarget._id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       else            await api.post('/properties', fd,               { headers: { 'Content-Type': 'multipart/form-data' } });
-
       setShowForm(false); load();
-    } catch { /* toast here if you have one */ }
+    } catch {}
     setSaving(false);
   };
 
@@ -323,35 +266,54 @@ export default function ManageProperties() {
 
   if (!token) return null;
 
+  // Status badge helper
+  const statusCls = (s: string) =>
+    s === 'available' ? 'bg-green-100 text-green-700' :
+    s === 'sold'      ? 'bg-red-100 text-red-700' :
+                        'bg-blue-100 text-blue-700';
+
   return (
     <AdminLayout>
-      <div className="p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Properties</h1>
+      <div className="p-4 sm:p-6 lg:p-8">
+
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Properties</h1>
           <button onClick={openCreate}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">
-            <Plus size={15}/> Add Property
+            className="flex items-center gap-1.5 sm:gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-sm font-medium transition-colors">
+            <Plus size={15}/>
+            <span className="hidden xs:inline">Add Property</span>
+            <span className="xs:hidden">Add</span>
           </button>
         </div>
 
-        {/* Crop Modal */}
+        {/* ── Crop Modal ── */}
         {cropSrc && (
-          <CropModal src={cropSrc} onDone={handleCropDone} onCancel={() => { setCropSrc(null); setCropIndex(null); setImages(prev => prev.filter((_, i) => i !== cropIndex)); }}/>
+          <CropModal
+            src={cropSrc}
+            onDone={handleCropDone}
+            onCancel={() => { setCropSrc(null); setImages(prev => prev.filter((_, i) => i !== cropIndex)); setCropIndex(null); }}
+          />
         )}
 
-        {/* Form Modal */}
+        {/* ── Form Modal — bottom sheet on mobile, centered on sm+ ── */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[92vh]">
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center sm:p-4">
+            <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-2xl shadow-xl flex flex-col max-h-[95vh] sm:max-h-[92vh]">
+
+              {/* Drag handle on mobile */}
+              <div className="flex justify-center pt-3 pb-1 sm:hidden shrink-0">
+                <div className="w-10 h-1 bg-gray-200 rounded-full"/>
+              </div>
+
               {/* Modal header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+              <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-100 shrink-0">
                 <h2 className="font-semibold text-gray-900">{editTarget ? 'Edit Property' : 'New Property'}</h2>
-                <button onClick={() => setShowForm(false)} className="p-1 rounded-lg hover:bg-gray-100"><X size={16}/></button>
+                <button onClick={() => setShowForm(false)} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16}/></button>
               </div>
 
               {/* Scrollable body */}
-              <form onSubmit={handleSave} className="overflow-y-auto px-6 py-5 space-y-5 flex-1">
+              <form onSubmit={handleSave} className="overflow-y-auto px-5 sm:px-6 py-5 space-y-4 sm:space-y-5 flex-1">
 
                 {/* Title */}
                 <div>
@@ -367,42 +329,21 @@ export default function ManageProperties() {
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 resize-none" placeholder="Description"/>
                 </div>
 
-                {/* Price + Area */}
-                <div className="grid grid-cols-2 gap-4">
-                  {/* <div>
-                    <label className="text-xs font-medium text-gray-500 mb-1 block">Price (₹)</label>
-                    <input required type="number" value={form.price} onChange={e => setForm(f => ({...f, price: e.target.value}))}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="0"/>
-                  </div> */}
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 mb-1 block">Area (sq ft)</label>
-                    <input type="number" value={form.area} onChange={e => setForm(f => ({...f, area: e.target.value}))}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="0"/>
-                  </div>
+                {/* Area — single col on mobile, 2-col if more fields are uncommented */}
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Area (sq ft)</label>
+                  <input type="number" value={form.area} onChange={e => setForm(f => ({...f, area: e.target.value}))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="0"/>
                 </div>
 
-                {/* Bedrooms + Bathrooms */}
-                {/* <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 mb-1 block">Bedrooms</label>
-                    <input type="number" value={form.bedrooms} onChange={e => setForm(f => ({...f, bedrooms: e.target.value}))}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="0"/>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-500 mb-1 block">Bathrooms</label>
-                    <input type="number" value={form.bathrooms} onChange={e => setForm(f => ({...f, bathrooms: e.target.value}))}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="0"/>
-                  </div>
-                </div> */}
-
-                {/* Location + Category */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* Location + Category — stack on mobile, side-by-side on sm+ */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 mb-1 block">Location</label>
                     <select value={form.location} onChange={e => setForm(f => ({...f, location: e.target.value}))}
                       className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 bg-white">
                       <option value="">Select location</option>
-                      {locations.map(l => <option key={l._id} value={l._id}>{l.city} {l.area ? `- ${l.area}` : ''}</option>)}
+                      {locations.map(l => <option key={l._id} value={l._id}>{l.city}{l.area ? ` - ${l.area}` : ''}</option>)}
                     </select>
                   </div>
                   <div>
@@ -438,22 +379,22 @@ export default function ManageProperties() {
                   </label>
                 </div>
 
-                {/* Images */}
+                {/* Images — 2 cols on mobile, 3 on sm+ */}
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-2 block">
-                    Images <span className="font-normal text-gray-400">(16:9 - up to 10)</span>
+                    Images <span className="font-normal text-gray-400">(16:9 · up to 10)</span>
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                     {images.map((img, i) => (
                       <div key={img.id} className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50" style={{ aspectRatio: '16/9' }}>
-                        <img src={`${img.preview}`} alt="" className="w-full h-full object-cover"/>
+                        <img src={img.preview} alt="" className="w-full h-full object-cover"/>
                         <div className="absolute top-1.5 right-1.5 flex gap-1">
                           <button type="button" onClick={() => handleRecrop(i)}
-                            className="bg-white/90 hover:bg-white rounded-lg p-1 shadow-sm">
+                            className="bg-white/90 hover:bg-white rounded-lg p-1.5 sm:p-1 shadow-sm">
                             <CropIcon size={11} className="text-gray-700"/>
                           </button>
                           <button type="button" onClick={() => removeImage(i)}
-                            className="bg-white/90 hover:bg-white rounded-lg p-1 shadow-sm">
+                            className="bg-white/90 hover:bg-white rounded-lg p-1.5 sm:p-1 shadow-sm">
                             <X size={11} className="text-gray-700"/>
                           </button>
                         </div>
@@ -462,26 +403,26 @@ export default function ManageProperties() {
                         )}
                       </div>
                     ))}
-
-                    {/* Add button */}
                     {images.length < 10 && (
                       <button type="button" onClick={() => fileInputRef.current?.click()}
                         className="border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-1.5 text-gray-400 hover:border-amber-400 hover:text-amber-500 transition-colors"
                         style={{ aspectRatio: '16/9' }}>
                         <ImagePlus size={18}/>
-                        <span className="text-xs">Add image</span>
+                        <span className="text-xs">Add</span>
                       </button>
                     )}
                   </div>
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange}/>
                 </div>
 
-                {/* Footer */}
-                <div className="flex gap-3 justify-end pt-2 border-t border-gray-100">
+                {/* Footer buttons — full-width on mobile */}
+                <div className="flex gap-2 sm:gap-3 sm:justify-end pt-2 border-t border-gray-100">
                   <button type="button" onClick={() => setShowForm(false)}
-                    className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
+                    className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">
+                    Cancel
+                  </button>
                   <button type="submit" disabled={saving}
-                    className="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white rounded-xl">
+                    className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white rounded-xl">
                     {saving ? 'Saving…' : editTarget ? 'Update' : 'Create'}
                   </button>
                 </div>
@@ -490,8 +431,8 @@ export default function ManageProperties() {
           </div>
         )}
 
-        {/* Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        {/* ── TABLE: hidden on mobile ── */}
+        <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 text-left">
@@ -505,31 +446,77 @@ export default function ManageProperties() {
               {loading
                 ? Array.from({length:5}).map((_,i) => (
                     <tr key={i} className="animate-pulse">
-                      {Array.from({length:5}).map((_,j) => <td key={j} className="px-5 py-4"><div className="h-4 bg-gray-100 rounded w-full"/></td>)}
+                      {Array.from({length:4}).map((_,j) => <td key={j} className="px-5 py-4"><div className="h-4 bg-gray-100 rounded w-full"/></td>)}
                     </tr>
                   ))
                 : properties.map(p => (
                     <tr key={p._id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-5 py-4 font-medium text-gray-800 max-w-xs truncate">{p.title}</td>
                       <td className="px-5 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${p.status === 'available' ? 'bg-green-100 text-green-700' : p.status === 'sold' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-                          {p.status}
-                        </span>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusCls(p.status)}`}>{p.status}</span>
                       </td>
-                      <td className="px-5 py-4 text-gray-600">{p.featured ? '✓' : 'X'}</td>
-                      <td className="px-5 py-4 flex justify-end gap-2">
-                        <button onClick={() => openEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"><Pencil size={14}/></button>
-                        <button onClick={() => handleDelete(p._id)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors"><Trash2 size={14}/></button>
+                      <td className="px-5 py-4 text-gray-600">{p.featured ? '✓' : '—'}</td>
+                      <td className="px-5 py-4">
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => openEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"><Pencil size={14}/></button>
+                          <button onClick={() => handleDelete(p._id)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors"><Trash2 size={14}/></button>
+                        </div>
                       </td>
                     </tr>
                   ))
               }
               {!loading && properties.length === 0 && (
-                <tr><td colSpan={5} className="px-5 py-10 text-center text-gray-400 text-sm">No properties yet.</td></tr>
+                <tr><td colSpan={4} className="px-5 py-10 text-center text-gray-400 text-sm">No properties yet.</td></tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* ── CARD LIST: shown on mobile ── */}
+        <div className="sm:hidden space-y-3">
+          {loading
+            ? Array.from({length: 3}).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse space-y-3">
+                  <div className="h-4 bg-gray-100 rounded w-3/4"/>
+                  <div className="flex gap-2">
+                    <div className="h-5 bg-gray-100 rounded-full w-20"/>
+                    <div className="h-5 bg-gray-100 rounded-full w-16"/>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-1">
+                    <div className="h-7 w-16 bg-gray-100 rounded-lg"/>
+                    <div className="h-7 w-16 bg-gray-100 rounded-lg"/>
+                  </div>
+                </div>
+              ))
+            : properties.length === 0
+              ? <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center text-gray-400 text-sm">No properties yet.</div>
+              : properties.map(p => (
+                  <div key={p._id} className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <p className="font-medium text-gray-800 text-sm leading-snug mb-2 line-clamp-2">{p.title}</p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusCls(p.status)}`}>{p.status}</span>
+                      {p.featured && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Featured</span>
+                      )}
+                      {p.isNewProject && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">New Project</span>
+                      )}
+                    </div>
+                    <div className="flex justify-end gap-2 pt-3 border-t border-gray-50">
+                      <button onClick={() => openEdit(p)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 text-xs font-medium transition-colors">
+                        <Pencil size={12}/> Edit
+                      </button>
+                      <button onClick={() => handleDelete(p._id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 text-xs font-medium transition-colors">
+                        <Trash2 size={12}/> Delete
+                      </button>
+                    </div>
+                  </div>
+                ))
+          }
+        </div>
+
       </div>
     </AdminLayout>
   );

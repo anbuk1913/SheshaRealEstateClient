@@ -4,7 +4,6 @@ import { AdminLayout } from './Dashboard';
 import { Pencil, Trash2, Plus, X, ImagePlus, CropIcon, Check } from 'lucide-react';
 
 interface CropBox { x: number; y: number; w: number; h: number }
-
 const CROP_RATIO = 16 / 9;
 
 // ─── CropModal ────────────────────────────────────────────────────────────────
@@ -17,37 +16,24 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
   const dragStart       = useRef<{ mx: number; my: number; cx: number; cy: number } | null>(null);
   const resizeDragStart = useRef<{ mx: number; my: number; cw: number } | null>(null);
 
-  // ── Get the rendered image rect RELATIVE to the container ──
-  // The img tag is w-full but maxHeight may make it shorter than container.
-  // We must clamp only to the actual pixel area the image occupies.
   const getImgBounds = useCallback(() => {
     const img = imgRef.current;
     const con = containerRef.current;
     if (!img || !con) return null;
     const imgRect = img.getBoundingClientRect();
     const conRect = con.getBoundingClientRect();
-    return {
-      x: imgRect.left - conRect.left,   // offset of image inside container
-      y: imgRect.top  - conRect.top,
-      w: imgRect.width,
-      h: imgRect.height,
-    };
+    return { x: imgRect.left - conRect.left, y: imgRect.top - conRect.top, w: imgRect.width, h: imgRect.height };
   }, []);
 
   const clampCrop = useCallback((box: CropBox): CropBox => {
     const bounds = getImgBounds();
     if (!bounds) return box;
     let { x, y, w, h } = box;
-
-    // Clamp size to image bounds
     w = Math.max(60, Math.min(w, bounds.w));
     h = w / CROP_RATIO;
     if (h > bounds.h) { h = bounds.h; w = h * CROP_RATIO; }
-
-    // Clamp position so box never leaves the image
     x = Math.max(bounds.x, Math.min(x, bounds.x + bounds.w - w));
     y = Math.max(bounds.y, Math.min(y, bounds.y + bounds.h - h));
-
     return { x, y, w, h };
   }, [getImgBounds]);
 
@@ -57,14 +43,9 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
     let w = bounds.w * 0.9;
     let h = w / CROP_RATIO;
     if (h > bounds.h) { h = bounds.h * 0.9; w = h * CROP_RATIO; }
-    setCrop({
-      x: bounds.x + (bounds.w - w) / 2,
-      y: bounds.y + (bounds.h - h) / 2,
-      w, h,
-    });
+    setCrop({ x: bounds.x + (bounds.w - w) / 2, y: bounds.y + (bounds.h - h) / 2, w, h });
   }, [getImgBounds]);
 
-  // ── Drag to move ──
   const onMouseDown = (e: React.MouseEvent) => {
     if (!crop) return;
     e.preventDefault();
@@ -85,7 +66,6 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
   }, [dragging, crop, clampCrop]);
 
-  // ── Resize handle ──
   const onResizeDown = (e: React.MouseEvent) => {
     if (!crop) return;
     e.stopPropagation(); e.preventDefault();
@@ -106,23 +86,17 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
   }, [resizing, crop, clampCrop]);
 
-  // ── Confirm: export exactly what's selected ──
   const handleConfirm = () => {
     if (!crop || !imgRef.current) return;
     const img    = imgRef.current;
     const bounds = getImgBounds();
     if (!bounds) return;
-
-    // Convert display-pixel crop (relative to container) → natural image pixels
     const scaleX = img.naturalWidth  / bounds.w;
     const scaleY = img.naturalHeight / bounds.h;
-
-    // Crop position relative to the image itself (subtract image offset inside container)
     const srcX = (crop.x - bounds.x) * scaleX;
     const srcY = (crop.y - bounds.y) * scaleY;
     const srcW = crop.w * scaleX;
     const srcH = crop.h * scaleY;
-
     const canvas = document.createElement('canvas');
     canvas.width  = Math.round(srcW);
     canvas.height = Math.round(srcH);
@@ -131,64 +105,52 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-[60] flex flex-col items-center justify-center p-4">
-      <div className="bg-white rounded-2xl p-4 shadow-2xl w-full max-w-2xl">
-        <div className="flex items-center justify-between mb-3">
+    // ── Full-screen on mobile, centered card on sm+ ──
+    <div className="fixed inset-0 bg-black/70 z-[60] flex flex-col items-center justify-center p-0 sm:p-4">
+      <div className="bg-white sm:rounded-2xl p-4 shadow-2xl w-full sm:max-w-2xl h-full sm:h-auto flex flex-col">
+        <div className="flex items-center justify-between mb-3 shrink-0">
           <div>
             <span className="font-semibold text-gray-900 text-sm">Crop Image</span>
             <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">16 : 9</span>
           </div>
-          <button onClick={onCancel} className="p-1 rounded-lg hover:bg-gray-100"><X size={15} /></button>
+          <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={15} /></button>
         </div>
 
-        {/* Container - position:relative so getBoundingClientRect offsets are correct */}
-        <div ref={containerRef} className="relative select-none rounded-xl bg-gray-900 overflow-hidden">
+        {/* Image container grows to fill available space on mobile */}
+        <div ref={containerRef} className="relative select-none rounded-xl bg-gray-900 overflow-hidden flex-1 sm:flex-none">
           <img
             ref={imgRef}
             src={src}
             onLoad={initCrop}
             draggable={false}
-            className="block mx-auto"
-            style={{ maxHeight: '55vh', maxWidth: '100%' }}
+            className="block mx-auto h-full sm:h-auto w-full object-contain"
+            style={{ maxHeight: '55vh' }}
           />
 
           {crop && (
             <>
-              {/* ── 4-piece dark mask - positioned relative to container ── */}
-              {/* Top */}
-              <div className="absolute pointer-events-none bg-black/55"
-                style={{ top: 0, left: 0, right: 0, height: crop.y }} />
-              {/* Bottom */}
-              <div className="absolute pointer-events-none bg-black/55"
-                style={{ top: crop.y + crop.h, left: 0, right: 0, bottom: 0 }} />
-              {/* Left */}
-              <div className="absolute pointer-events-none bg-black/55"
-                style={{ top: crop.y, left: 0, width: crop.x, height: crop.h }} />
-              {/* Right */}
-              <div className="absolute pointer-events-none bg-black/55"
-                style={{ top: crop.y, left: crop.x + crop.w, right: 0, height: crop.h }} />
+              <div className="absolute pointer-events-none bg-black/55" style={{ top: 0, left: 0, right: 0, height: crop.y }} />
+              <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y + crop.h, left: 0, right: 0, bottom: 0 }} />
+              <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y, left: 0, width: crop.x, height: crop.h }} />
+              <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y, left: crop.x + crop.w, right: 0, height: crop.h }} />
 
-              {/* ── Crop box ── */}
               <div
                 onMouseDown={onMouseDown}
                 className="absolute border-2 border-white"
                 style={{ left: crop.x, top: crop.y, width: crop.w, height: crop.h, cursor: 'move' }}
               >
-                {/* Rule-of-thirds */}
                 {[1/3, 2/3].map(f => (
                   <div key={f} className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-0 bottom-0 border-l border-white/30" style={{ left: `${f*100}%` }} />
                     <div className="absolute left-0 right-0 border-t border-white/30" style={{ top: `${f*100}%` }} />
                   </div>
                 ))}
-                {/* Corner handles */}
                 {['top-0 left-0 border-t-2 border-l-2','top-0 right-0 border-t-2 border-r-2','bottom-0 left-0 border-b-2 border-l-2','bottom-0 right-0 border-b-2 border-r-2'].map((cls, i) => (
                   <div key={i} className={`absolute w-4 h-4 border-amber-400 ${cls} -m-0.5`} />
                 ))}
-                {/* Resize grip */}
                 <div
                   onMouseDown={onResizeDown}
-                  className="absolute bottom-0 right-0 w-5 h-5 bg-amber-400 rounded-tl-md cursor-se-resize flex items-center justify-center"
+                  className="absolute bottom-0 right-0 w-6 h-6 bg-amber-400 rounded-tl-md cursor-se-resize flex items-center justify-center"
                   style={{ marginBottom: -2, marginRight: -2 }}
                 >
                   <svg width="8" height="8" viewBox="0 0 8 8"><path d="M1 7L7 1M4 7L7 4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
@@ -198,9 +160,9 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
           )}
         </div>
 
-        <div className="flex gap-3 justify-end mt-4">
-          <button onClick={onCancel} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
-          <button onClick={handleConfirm} className="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-xl flex items-center gap-1.5">
+        <div className="flex gap-3 justify-end mt-4 shrink-0">
+          <button onClick={onCancel} className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
+          <button onClick={handleConfirm} className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-xl flex items-center justify-center gap-1.5">
             <Check size={14}/> Apply Crop
           </button>
         </div>
@@ -283,74 +245,134 @@ export default function ManageBlogs() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Blogs</h1>
-          <button onClick={openCreate} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">
-            <Plus size={15} /> New Blog
+      {/* ── Responsive page padding ── */}
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Blogs</h1>
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-1.5 sm:gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-sm font-medium transition-colors"
+          >
+            <Plus size={15} />
+            <span className="hidden xs:inline sm:inline">New Blog</span>
+            <span className="xs:hidden sm:hidden">New</span>
           </button>
         </div>
 
         {cropSrc && <CropModal src={cropSrc} onDone={handleCropDone} onCancel={() => setCropSrc(null)} />}
 
+        {/* ── Form Modal: full-screen on mobile, card on sm+ ── */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center sm:p-4">
+            <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg p-5 sm:p-6 shadow-xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-gray-900">{editTarget ? 'Edit Blog' : 'New Blog'}</h2>
-                <button onClick={() => setShowForm(false)} className="p-1 rounded-lg hover:bg-gray-100"><X size={16} /></button>
+                <button onClick={() => setShowForm(false)} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16} /></button>
               </div>
-              <form onSubmit={handleSave}>
-                <label htmlFor="title" className='text-sm text-gray-600 mb-2 font-medium ml-1'>Blog Title</label>
-                <input required value={form.title} onChange={e => setForm(f => ({...f, title: e.target.value}))}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 mb-5" placeholder="Enter Blog Title..." />
-                <label htmlFor="excerpt" className='text-sm text-gray-600 mb-2 font-medium ml-1'>Short Excerpt</label>
-                <input value={form.excerpt} onChange={e => setForm(f => ({...f, excerpt: e.target.value}))}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 mb-5" placeholder="Enter short excerpt..." />
-                <label htmlFor="content" className='text-sm text-gray-600 mb-2 font-medium ml-1'>Full Blog Content</label>
-                <textarea required rows={5} value={form.content} onChange={e => setForm(f => ({...f, content: e.target.value}))}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 resize-none mb-5" placeholder="Enter full blog content..." />
 
-                <div>
-                  <p className="text-sm text-gray-600 mb-2 font-medium">Cover Image <span className="text-gray-400 font-normal">(16:9)</span></p>
+              {/* Drag handle hint on mobile */}
+              <div className="flex justify-center mb-4 sm:hidden">
+                <div className="w-10 h-1 bg-gray-200 rounded-full" />
+              </div>
+
+              <form onSubmit={handleSave} className="space-y-1">
+                <label className='block text-sm text-gray-600 mb-1.5 font-medium ml-1'>Blog Title</label>
+                <input
+                  required
+                  value={form.title}
+                  onChange={e => setForm(f => ({...f, title: e.target.value}))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 mb-4"
+                  placeholder="Enter Blog Title..."
+                />
+
+                <label className='block text-sm text-gray-600 mb-1.5 font-medium ml-1'>Short Excerpt</label>
+                <input
+                  value={form.excerpt}
+                  onChange={e => setForm(f => ({...f, excerpt: e.target.value}))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 mb-4"
+                  placeholder="Enter short excerpt..."
+                />
+
+                <label className='block text-sm text-gray-600 mb-1.5 font-medium ml-1'>Full Blog Content</label>
+                <textarea
+                  required
+                  rows={5}
+                  value={form.content}
+                  onChange={e => setForm(f => ({...f, content: e.target.value}))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 resize-none mb-4"
+                  placeholder="Enter full blog content..."
+                />
+
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-2 font-medium">
+                    Cover Image <span className="text-gray-400 font-normal">(16:9)</span>
+                  </p>
                   {imagePreview ? (
                     <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
                       <img src={imagePreview} alt="Preview" className="w-full object-cover" style={{ aspectRatio: '16/9' }} />
                       <div className="absolute top-2 right-2 flex gap-1.5">
-                        <button type="button" onClick={() => setCropSrc(imagePreview)}
-                          className="bg-white/90 hover:bg-white rounded-lg p-1.5 shadow-sm transition-colors flex items-center gap-1 text-xs text-gray-700 font-medium px-2">
+                        <button
+                          type="button"
+                          onClick={() => setCropSrc(imagePreview)}
+                          className="bg-white/90 hover:bg-white rounded-lg p-1.5 shadow-sm transition-colors flex items-center gap-1 text-xs text-gray-700 font-medium px-2"
+                        >
                           <CropIcon size={12}/> Re-crop
                         </button>
-                        <button type="button" onClick={resetImage} className="bg-white/90 hover:bg-white rounded-lg p-1.5 shadow-sm transition-colors">
+                        <button
+                          type="button"
+                          onClick={resetImage}
+                          className="bg-white/90 hover:bg-white rounded-lg p-1.5 shadow-sm transition-colors"
+                        >
                           <X size={13} className="text-gray-700" />
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <button type="button" onClick={() => fileInputRef.current?.click()}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
                       className="w-full border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-amber-400 hover:text-amber-500 transition-colors"
-                      style={{ aspectRatio: '16/9' }}>
+                      style={{ aspectRatio: '16/9' }}
+                    >
                       <ImagePlus size={22} />
-                      <span className="text-xs">Click to upload - will be cropped to 16:9</span>
+                      <span className="text-xs text-center px-4">Click to upload · cropped to 16:9</span>
                     </button>
                   )}
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                 </div>
 
-                <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                  <input type="checkbox" checked={form.published} onChange={e => setForm(f => ({...f, published: e.target.checked}))} className="rounded" />
-                  Publish
+                <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer mb-4">
+                  <input
+                    type="checkbox"
+                    checked={form.published}
+                    onChange={e => setForm(f => ({...f, published: e.target.checked}))}
+                    className="rounded"
+                  />
+                  Publish immediately
                 </label>
-                <div className="flex gap-3 justify-end">
-                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-xl">Save</button>
+
+                <div className="flex gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-xl"
+                  >
+                    Save
+                  </button>
                 </div>
               </form>
             </div>
           </div>
         )}
 
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        {/* ── TABLE: hidden on mobile, shown on sm+ ── */}
+        <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 text-left">
@@ -362,9 +384,11 @@ export default function ManageBlogs() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading
-                ? Array.from({length: 4}).map((_,i) => (
+                ? Array.from({length: 4}).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      {Array.from({length:4}).map((_,j) => <td key={j} className="px-5 py-4"><div className="h-4 bg-gray-100 rounded w-full"/></td>)}
+                      {Array.from({length: 4}).map((_, j) => (
+                        <td key={j} className="px-5 py-4"><div className="h-4 bg-gray-100 rounded w-full"/></td>
+                      ))}
                     </tr>
                   ))
                 : blogs.map(b => (
@@ -376,9 +400,11 @@ export default function ManageBlogs() {
                           {b.published ? 'Published' : 'Draft'}
                         </span>
                       </td>
-                      <td className="px-5 py-4 flex justify-end gap-2">
-                        <button onClick={() => openEdit(b)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800"><Pencil size={14}/></button>
-                        <button onClick={() => handleDelete(b._id)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600"><Trash2 size={14}/></button>
+                      <td className="px-5 py-4">
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => openEdit(b)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800"><Pencil size={14}/></button>
+                          <button onClick={() => handleDelete(b._id)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600"><Trash2 size={14}/></button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -388,6 +414,60 @@ export default function ManageBlogs() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* ── CARD LIST: shown on mobile, hidden on sm+ ── */}
+        <div className="sm:hidden space-y-3">
+          {loading
+            ? Array.from({length: 3}).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse space-y-3">
+                  <div className="h-4 bg-gray-100 rounded w-3/4"/>
+                  <div className="h-3 bg-gray-100 rounded w-1/2"/>
+                  <div className="flex justify-between items-center">
+                    <div className="h-5 bg-gray-100 rounded-full w-20"/>
+                    <div className="flex gap-2">
+                      <div className="h-8 w-8 bg-gray-100 rounded-lg"/>
+                      <div className="h-8 w-8 bg-gray-100 rounded-lg"/>
+                    </div>
+                  </div>
+                </div>
+              ))
+            : blogs.length === 0
+              ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center text-gray-400 text-sm">
+                  No blogs yet.
+                </div>
+              )
+              : blogs.map(b => (
+                  <div key={b._id} className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-800 text-sm leading-snug line-clamp-2">{b.title}</p>
+                        {b.author && (
+                          <p className="text-xs text-gray-400 mt-0.5">{b.author}</p>
+                        )}
+                      </div>
+                      <span className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium ${b.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {b.published ? 'Published' : 'Draft'}
+                      </span>
+                    </div>
+                    <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-50">
+                      <button
+                        onClick={() => openEdit(b)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 text-xs font-medium transition-colors"
+                      >
+                        <Pencil size={12}/> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(b._id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 text-xs font-medium transition-colors"
+                      >
+                        <Trash2 size={12}/> Delete
+                      </button>
+                    </div>
+                  </div>
+                ))
+          }
         </div>
       </div>
     </AdminLayout>

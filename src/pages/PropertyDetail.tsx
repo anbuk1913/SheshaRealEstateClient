@@ -20,6 +20,38 @@ export default function PropertyDetail() {
       .catch(() => { setError('Property not found.'); setLoading(false); });
   }, [id]);
 
+  function renderDescription(text: string) {
+    return text.split('\n').map((line, i) => {
+      if (line.trim() === '') {
+        return <span key={i} className="block h-2" />;
+      }
+
+      const parts = line.split(/(\*[^*]+\*|"[^"]+"|'[^']+')/g);
+      const hasStarHighlight = parts.some(p => /^\*[^*]+\*$/.test(p));
+
+      return (
+        <span key={i} className={`block ${hasStarHighlight ? 'flex items-start gap-2' : ''}`}>
+          {hasStarHighlight && (
+            <span className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0 inline-block" />
+          )}
+          <span>
+            {parts.map((part, j) =>
+              /^(\*[^*]+\*|"[^"]+"|'[^']+')$/.test(part) ? (
+                <strong key={j} className="font-semibold text-gray-900">
+                  {part.slice(1, -1)}
+                </strong>
+              ) : (
+                <span key={j}>{part}</span>
+              )
+            )}
+          </span>
+        </span>
+      );
+    });
+  }
+
+
+
   if (loading) return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -80,7 +112,7 @@ export default function PropertyDetail() {
               {property.description && (
                 <div>
                   <h2 className="font-semibold text-gray-900 mb-3">Description</h2>
-                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{property.description}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{renderDescription(property.description)}</p>
                 </div>
               )}
 

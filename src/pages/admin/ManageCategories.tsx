@@ -42,22 +42,28 @@ export default function ManageCategories() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Categories</h1>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Categories</h1>
           <button onClick={openCreate}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">
-            <Plus size={15}/> Add Category
+            className="flex items-center gap-1.5 sm:gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-sm font-medium transition-colors">
+            <Plus size={15}/>
+            <span className="hidden xs:inline">Add Category</span>
+            <span className="xs:hidden">Add</span>
           </button>
         </div>
 
-        {/* Modal */}
+        {/* Modal — sheet on mobile, centered dialog on sm+ */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl">
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center sm:p-4">
+            <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm p-5 sm:p-6 shadow-xl">
+              {/* Drag handle on mobile */}
+              <div className="flex justify-center mb-4 sm:hidden">
+                <div className="w-10 h-1 bg-gray-200 rounded-full" />
+              </div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-gray-900">{editTarget ? 'Edit Category' : 'New Category'}</h2>
-                <button onClick={() => setShowForm(false)} className="p-1 rounded-lg hover:bg-gray-100"><X size={16}/></button>
+                <button onClick={() => setShowForm(false)} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={16}/></button>
               </div>
               <form onSubmit={handleSave} className="space-y-4">
                 <div>
@@ -66,11 +72,11 @@ export default function ManageCategories() {
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400"
                     placeholder="e.g. Apartment, Villa, Plot" />
                 </div>
-                <div className="flex gap-3 justify-end pt-2">
+                <div className="flex gap-3 pt-2">
                   <button type="button" onClick={() => setShowForm(false)}
-                    className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
+                    className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
                   <button type="submit" disabled={saving}
-                    className="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white rounded-xl">
+                    className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white rounded-xl">
                     {saving ? 'Saving…' : 'Save'}
                   </button>
                 </div>
@@ -79,8 +85,8 @@ export default function ManageCategories() {
           </div>
         )}
 
-        {/* Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        {/* TABLE — hidden on mobile */}
+        <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 text-left">
@@ -106,11 +112,13 @@ export default function ManageCategories() {
                       <td className="px-5 py-4 text-gray-500">
                         {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="px-5 py-4 flex justify-end gap-2">
-                        <button onClick={() => openEdit(c)}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800"><Pencil size={14}/></button>
-                        <button onClick={() => handleDelete(c._id)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600"><Trash2 size={14}/></button>
+                      <td className="px-5 py-4">
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => openEdit(c)}
+                            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800"><Pencil size={14}/></button>
+                          <button onClick={() => handleDelete(c._id)}
+                            className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600"><Trash2 size={14}/></button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -120,6 +128,54 @@ export default function ManageCategories() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* CARD LIST — shown on mobile */}
+        <div className="sm:hidden space-y-3">
+          {loading
+            ? Array.from({length: 3}).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse space-y-3">
+                  <div className="h-4 bg-gray-100 rounded w-1/2"/>
+                  <div className="h-3 bg-gray-100 rounded w-1/3"/>
+                  <div className="flex justify-between items-center pt-1">
+                    <div className="h-3 bg-gray-100 rounded w-1/4"/>
+                    <div className="flex gap-2">
+                      <div className="h-8 w-16 bg-gray-100 rounded-lg"/>
+                      <div className="h-8 w-16 bg-gray-100 rounded-lg"/>
+                    </div>
+                  </div>
+                </div>
+              ))
+            : items.length === 0
+              ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center text-gray-400 text-sm">
+                  No categories yet.
+                </div>
+              )
+              : items.map(c => (
+                  <div key={c._id} className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <div className="flex items-start justify-between gap-3 mb-1">
+                      <p className="font-medium text-gray-800 text-sm">{c.name}</p>
+                    </div>
+                    {c.slug && (
+                      <p className="text-xs font-mono text-gray-400 mb-1">{c.slug}</p>
+                    )}
+                    <p className="text-xs text-gray-400">
+                      {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                    <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-50">
+                      <button onClick={() => openEdit(c)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 text-xs font-medium transition-colors">
+                        <Pencil size={12}/> Edit
+                      </button>
+                      <button onClick={() => handleDelete(c._id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 text-xs font-medium transition-colors">
+                        <Trash2 size={12}/> Delete
+                      </button>
+                    </div>
+                  </div>
+                ))
+          }
         </div>
       </div>
     </AdminLayout>
