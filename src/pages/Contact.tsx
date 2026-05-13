@@ -34,7 +34,7 @@ export default function Contact() {
               {[
                 { icon: Phone,   label: 'Phone',   value: '+91 63792 52638',          href: 'tel:+916379252638' },
                 { icon: Mail,    label: 'Email',   value: 'shesharealestatesolutions@gmail.com',   href: 'mailto:shesharealestatesolutions@gmail.com' },
-                { icon: MapPin,  label: 'Address', value: '123 Shesha Towers, Banjara Hills, Hyderabad — 500034', href: '#' },
+                { icon: MapPin,  label: 'Address', value: '2nd floor No-125, P.H.Road, Maduravayal Chennai - 600095', href: '#' },
                 { icon: Clock,   label: 'Hours',   value: 'Mon–Sat: 9AM – 7PM', href: '#' },
               ].map(({ icon: Icon, label, value, href }) => (
                 <a key={label} href={href} className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-gray-100 hover:border-amber-200 transition-colors group">

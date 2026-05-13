@@ -113,8 +113,8 @@ export default function ManageLocations() {
                 : items.map(l => (
                     <tr key={l._id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-5 py-4 font-medium text-gray-800">{l.city}</td>
-                      <td className="px-5 py-4 text-gray-500">{l.area || '—'}</td>
-                      <td className="px-5 py-4 text-gray-500">{l.state || '—'}</td>
+                      <td className="px-5 py-4 text-gray-500">{l.area || '-'}</td>
+                      <td className="px-5 py-4 text-gray-500">{l.state || '-'}</td>
                       <td className="px-5 py-4 text-gray-500">{l.country}</td>
                       <td className="px-5 py-4 flex justify-end gap-2">
                         <button onClick={() => openEdit(l)}

@@ -51,7 +51,7 @@ export const Footer = () => (
         <div>
           <h4 className="font-semibold text-white mb-4">Contact</h4>
           <ul className="space-y-3 text-sm">
-            <li className="flex gap-2"><MapPin size={14} className="text-amber-400 mt-0.5 shrink-0" /><span>123 Shesha Towers, Hyderabad, Telangana — 500001</span></li>
+            <li className="flex gap-2"><MapPin size={14} className="text-amber-400 mt-0.5 shrink-0" /><span>2nd floor No-125, P.H.Road, Maduravayal Chennai - 600095</span></li>
             <li className="flex gap-2"><Phone size={14} className="text-amber-400 shrink-0" /><span>+91 63792 52638</span></li>
             <li className="flex gap-2"><Mail size={14} className="text-amber-400 shrink-0" /><span>shesharealestatesolutions@gmail.com</span></li>
           </ul>

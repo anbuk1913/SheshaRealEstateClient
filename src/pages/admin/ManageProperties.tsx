@@ -372,7 +372,7 @@ export default function ManageProperties() {
                     <select value={form.location} onChange={e => setForm(f => ({...f, location: e.target.value}))}
                       className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400 bg-white">
                       <option value="">Select location</option>
-                      {locations.map(l => <option key={l._id} value={l._id}>{l.city} {l.area ? `— ${l.area}` : ''}</option>)}
+                      {locations.map(l => <option key={l._id} value={l._id}>{l.city} {l.area ? `- ${l.area}` : ''}</option>)}
                     </select>
                   </div>
                   <div>
@@ -411,7 +411,7 @@ export default function ManageProperties() {
                 {/* Images */}
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-2 block">
-                    Images <span className="font-normal text-gray-400">(16:9 — up to 10)</span>
+                    Images <span className="font-normal text-gray-400">(16:9 - up to 10)</span>
                   </label>
                   <div className="grid grid-cols-3 gap-3">
                     {images.map((img, i) => (

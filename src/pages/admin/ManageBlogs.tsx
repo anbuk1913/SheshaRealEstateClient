@@ -141,7 +141,7 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
           <button onClick={onCancel} className="p-1 rounded-lg hover:bg-gray-100"><X size={15} /></button>
         </div>
 
-        {/* Container — position:relative so getBoundingClientRect offsets are correct */}
+        {/* Container - position:relative so getBoundingClientRect offsets are correct */}
         <div ref={containerRef} className="relative select-none rounded-xl bg-gray-900 overflow-hidden">
           <img
             ref={imgRef}
@@ -154,7 +154,7 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
 
           {crop && (
             <>
-              {/* ── 4-piece dark mask — positioned relative to container ── */}
+              {/* ── 4-piece dark mask - positioned relative to container ── */}
               {/* Top */}
               <div className="absolute pointer-events-none bg-black/55"
                 style={{ top: 0, left: 0, right: 0, height: crop.y }} />
@@ -331,7 +331,7 @@ export default function ManageBlogs() {
                       className="w-full border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-amber-400 hover:text-amber-500 transition-colors"
                       style={{ aspectRatio: '16/9' }}>
                       <ImagePlus size={22} />
-                      <span className="text-xs">Click to upload — will be cropped to 16:9</span>
+                      <span className="text-xs">Click to upload - will be cropped to 16:9</span>
                     </button>
                   )}
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
