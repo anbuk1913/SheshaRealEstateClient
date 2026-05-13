@@ -106,7 +106,7 @@ export default function PropertyDetail() {
               <div className="flex flex-wrap gap-6 py-4 border-y border-gray-100">
                 {/* <span className="flex items-center gap-2 text-sm text-gray-600"><BedDouble size={16} className="text-amber-500" /> {property.bedrooms} Bedrooms</span>
                 <span className="flex items-center gap-2 text-sm text-gray-600"><Bath size={16} className="text-amber-500" /> {property.bathrooms} Bathrooms</span> */}
-                <span className="flex items-center gap-2 text-sm text-gray-600"><Maximize2 size={16} className="text-amber-500" /> {property.area} sq ft</span>
+                {property.area && <span className="flex items-center gap-2 text-sm text-gray-600"><Maximize2 size={16} className="text-amber-500" /> {property.area} sq ft</span>}
               </div>
 
               {property.description && (
