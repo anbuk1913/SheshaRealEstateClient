@@ -25,6 +25,10 @@ export const BlogCard = ({ blog }: Props) => (
           src={`${import.meta.env.VITE_BASE_URL}${blog.coverImage}`}
           alt={blog.title}
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null; // prevent infinite loop
+            e.currentTarget.src = '/blog_default.jpeg';
+          }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
 

@@ -1,5 +1,29 @@
 import { Link } from 'react-router-dom';
 import { Building2, Mail, Phone, MapPin, Facebook, Instagram, Twitter } from 'lucide-react';
+import { FaWhatsapp } from "react-icons/fa";
+
+const SOCIAL_LINKS = [
+  {
+    Icon: Facebook,
+    href: 'https://www.facebook.com',
+    label: 'Facebook',
+  },
+  {
+    Icon: Instagram,
+    href: 'https://www.instagram.com',
+    label: 'Instagram',
+  },
+  {
+    Icon: Twitter,
+    href: 'https://www.x.com',
+    label: 'Twitter',
+  },
+  {
+    Icon: FaWhatsapp,
+    href: 'https://wa.me/916379252638',
+    label: 'WhatsApp',
+  },
+];
 
 export const Footer = () => (
   <footer className="bg-gray-900 text-gray-300">
@@ -19,8 +43,15 @@ export const Footer = () => (
             Premium real estate solutions across India. Your dream home, our expertise.
           </p>
           <div className="flex gap-3 mt-4">
-            {[Facebook, Instagram, Twitter].map((Icon, i) => (
-              <a key={i} href="#" className="w-8 h-8 rounded-full bg-gray-800 hover:bg-amber-500 flex items-center justify-center transition-colors">
+            {SOCIAL_LINKS.map(({ Icon, href, label }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="w-8 h-8 rounded-full bg-gray-800 hover:bg-amber-500 flex items-center justify-center transition-colors"
+              >
                 <Icon size={14} />
               </a>
             ))}
@@ -51,9 +82,9 @@ export const Footer = () => (
         <div>
           <h4 className="font-semibold text-white mb-4">Contact</h4>
           <ul className="space-y-3 text-sm">
-            <li className="flex gap-2"><MapPin size={14} className="text-amber-400 mt-0.5 shrink-0" /><span>2nd floor No-125, P.H.Road, Maduravayal Chennai - 600095</span></li>
-            <li className="flex gap-2"><Phone size={14} className="text-amber-400 shrink-0" /><span>+91 63792 52638</span></li>
-            <li className="flex gap-2"><Mail size={14} className="text-amber-400 shrink-0" /><span>shesharealestatesolutions@gmail.com</span></li>
+            <li className="flex gap-2"><MapPin size={14} className="text-amber-400 mt-0.5 shrink-0 mt-1" /><span>2nd floor No-125, P.H.Road, Maduravayal Chennai - 600095</span></li>
+            <li className="flex gap-2"><Phone size={14} className="text-amber-400 shrink-0 mt-1" /><span>+91 63792 52638</span></li>
+            <li className="flex gap-2"><Mail size={14} className="text-amber-400 shrink-0 mt-1" /><span>shesharealestatesolutions@gmail.com</span></li>
           </ul>
         </div>
       </div>

@@ -15,7 +15,10 @@ export const PropertyCard = ({ property }: Props) => (
     className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
     <div className="relative overflow-hidden aspect-[4/3]">
       <img
-        src={`${import.meta.env.VITE_BASE_URL}${property.images[0]}` || '/placeholder.jpg'}
+        src={`${import.meta.env.VITE_BASE_URL}${property.images[0]}`}
+        onError={(e) => {
+          e.currentTarget.src = '/blog_default.jpeg';
+        }}
         loading="lazy"
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
