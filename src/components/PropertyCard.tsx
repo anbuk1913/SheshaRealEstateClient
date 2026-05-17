@@ -43,9 +43,11 @@ export const PropertyCard = ({ property }: Props) => (
         <span>{property.location.area}, {property.location.city}</span>
       </div>
       <div className="flex items-center gap-4 text-sm text-gray-500 border-t border-gray-100 pt-3">
-        <span className="flex items-center gap-1"><BedDouble size={13} /> {property.bedrooms} Beds</span>
-        <span className="flex items-center gap-1"><Bath size={13} /> {property.bathrooms} Baths</span>
-        <span className="flex items-center gap-1"><Maximize2 size={13} /> {property.area} sqft</span>
+        {/* <span className="flex items-center gap-1"><BedDouble size={13} /> {property.bedrooms} Beds</span>
+        <span className="flex items-center gap-1"><Bath size={13} /> {property.bathrooms} Baths</span> */}
+        { property.area > 0 && (
+          <span className="flex items-center gap-1"><Maximize2 size={13} /> {property.area} sqft</span>
+        )}
       </div>
     </div>
   </Link>

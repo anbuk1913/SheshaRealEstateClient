@@ -21,6 +21,20 @@ export const loginAsync = createAsyncThunk(
     try {
       const res: any = await api.post('/users/login', credentials);
       localStorage.setItem('adminToken', res.data.token);
+      
+      // Extract and store token expiry time
+      try {
+        const parts = res.data.token.split('.');
+        if (parts.length === 3) {
+          const decoded = JSON.parse(atob(parts[1]));
+          if (decoded.exp) {
+            localStorage.setItem('tokenExpiresAt', String(decoded.exp * 1000));
+          }
+        }
+      } catch (decodeError) {
+        console.error('Failed to decode token:', decodeError);
+      }
+      
       return res.data;
     } catch (err: any) {
       return rejectWithValue(err.message || 'Login failed');
@@ -36,6 +50,7 @@ const authSlice = createSlice({
       state.user  = null;
       state.token = null;
       localStorage.removeItem('adminToken');
+      localStorage.removeItem('tokenExpiresAt');
     },
     setCredentials: (state, action) => {
       state.user  = action.payload.user;

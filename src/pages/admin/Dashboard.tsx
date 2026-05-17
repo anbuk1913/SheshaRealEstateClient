@@ -3,7 +3,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import { logout, loginAsync } from '../../features/auth/authSlice';
-import { Building2, LayoutDashboard, Newspaper, Settings, LogOut, Menu, X, MapPin, Tag } from 'lucide-react'; // ← add MapPin, Tag
+import { useTokenExpiry } from '../../hooks/useTokenExpiry';
+import { Building2, LayoutDashboard, Newspaper, Settings, LogOut, Menu, X, MapPin, Tag, Home } from 'lucide-react'; // ← add MapPin, Tag
 
 const navItems = [
   { to: '/admin',            label: 'Dashboard',  icon: LayoutDashboard },
@@ -20,6 +21,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((s: RootState) => s.auth);
+
+  useTokenExpiry(); // Auto-logout when token expires
 
   useEffect(() => {
     const handleResize = () => setCollapsed(window.innerWidth < 768);
@@ -58,6 +61,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <button onClick={() => setCollapsed(c => !c)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
             {collapsed ? <Menu size={18} /> : <X size={18} />}
           </button>
+          <div className="hidden md:flex items-center gap-1">
+          <Link
+              to="/"
+              className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-amber-600 transition-colors"
+            >
+              <Home size={15} /> Home
+            </Link>
+          </div>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 font-semibold text-sm">
               {user?.name?.charAt(0) || 'A'}
