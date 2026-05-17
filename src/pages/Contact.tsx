@@ -23,7 +23,7 @@ export default function Contact() {
       setSubmitted(true);
       setToast({
         show: true,
-        message: 'Message Sent Successfully',
+        message: 'Message Sent',
         subText: "We'll get back to you within 24 hours.",
         type: 'success',
       });
