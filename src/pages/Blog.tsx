@@ -7,6 +7,11 @@ import { Footer } from '../components/Footer';
 import { BlogCard } from '../components/BlogCard';
 import { FileText } from 'lucide-react';
 
+const radialPatternStyle: React.CSSProperties = {
+  backgroundImage: 'repeating-radial-gradient(#e2d1d1 50%, #e7d2d2ee 70%, #f2d2b8 25%)',
+  backgroundSize: '50px 50px',
+};
+
 export default function Blog() {
   const dispatch = useDispatch<AppDispatch>();
   const { items: blogs, loading } = useSelector((s: RootState) => s.blogs);
@@ -17,7 +22,7 @@ export default function Blog() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 bg-gray-50">
-        <div className="bg-white border-b border-gray-100">
+        <div className="border-b border-gray-100" style={radialPatternStyle}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
             <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <FileText size={22} className="text-amber-500" />

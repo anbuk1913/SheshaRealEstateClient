@@ -14,11 +14,16 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Award, Users, TrendingUp } from 'lucide-react';
 
 const stats = [
-  { label: 'Properties Listed', value: '2,400+', icon: TrendingUp },
-  { label: 'Happy Clients',     value: '1,800+', icon: Users },
-  { label: 'Years Experience',  value: '12+',    icon: Award },
-  { label: 'Cities Covered',    value: '15+',    icon: Shield },
+  { label: 'Properties Listed', value: '2,000+', icon: TrendingUp },
+  { label: 'Happy Clients',     value: '100+', icon: Users },
+  { label: 'Years Experience',  value: '10+',    icon: Award },
+  { label: 'Cities Covered',    value: '50+',    icon: Shield },
 ];
+
+const radialPatternStyle: React.CSSProperties = {
+  backgroundImage: 'repeating-radial-gradient(#e2d1d1 50%, #e7d2d2ee 70%, #f5c7a1 95%)',
+  backgroundSize: '50px 50px',
+};
 
 export default function Home() {
   const dispatch = useDispatch<AppDispatch>();
@@ -38,7 +43,7 @@ export default function Home() {
         <HeroSection />
 
         {/* ── Stats ── */}
-        <section className="bg-white border-b border-gray-100 py-8">
+        <section className="border-b border-gray-100 py-8" style={{ background: 'rgba(196, 199, 245, 0.37)' }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map(({ label, value, icon: Icon }) => (
               <div key={label} className="flex flex-col items-center text-center gap-2">
@@ -53,37 +58,14 @@ export default function Home() {
         </section>
 
         {/* ── Featured Properties ── */}
-        <section className="relative py-16 overflow-hidden bg-white">
+        <section className="relative py-16 overflow-hidden">
+          {/* Full-cover radial pattern */}
+          <div className="absolute inset-0 z-0" style={radialPatternStyle} />
 
-          {/* Soft amber radial glow — top right */}
-          <div
-            className="absolute -top-32 -right-32 w-[550px] h-[550px] z-0 pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(251,191,36,0.18) 0%, transparent 65%)' }}
-          />
-
-          {/* Soft amber radial glow — bottom left */}
-          <div
-            className="absolute -bottom-32 -left-32 w-[420px] h-[420px] z-0 pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 65%)' }}
-          />
-
-          {/* Dot grid pattern — fades toward edges */}
+          {/* Soft white fade overlay so cards don't clash with pattern */}
           <div
             className="absolute inset-0 z-0 pointer-events-none"
-            style={{
-              backgroundImage: 'radial-gradient(circle, rgba(180,130,40,0.12) 1px, transparent 1px)',
-              backgroundSize: '28px 28px',
-              maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)',
-              WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)',
-            }}
-          />
-
-          {/* Top amber border accent line */}
-          <div
-            className="absolute top-0 left-0 right-0 h-px z-0 pointer-events-none"
-            style={{
-              background: 'linear-gradient(to right, transparent, rgba(245,158,11,0.4) 40%, rgba(245,158,11,0.4) 60%, transparent)',
-            }}
+            style={{ background: 'rgba(255,255,255,0.55)' }}
           />
 
           {/* Content */}
@@ -125,46 +107,14 @@ export default function Home() {
 
         {/* ── Latest Blogs ── */}
         {blogs.length > 0 && (
-          <section className="relative py-16 overflow-hidden" style={{ background: '#fffbf4' }}>
+          <section className="relative py-16 overflow-hidden">
+            {/* Full-cover radial pattern */}
+            <div className="absolute inset-0 z-0" style={radialPatternStyle} />
 
-            {/* Diagonal soft stripe bands */}
+            {/* Slightly warmer overlay to visually distinguish from section above */}
             <div
               className="absolute inset-0 z-0 pointer-events-none"
-              style={{
-                backgroundImage: `repeating-linear-gradient(
-                  -55deg,
-                  transparent,
-                  transparent 40px,
-                  rgba(245,158,11,0.04) 40px,
-                  rgba(245,158,11,0.04) 80px
-                )`,
-              }}
-            />
-
-            {/* Large circle ring — top left */}
-            <div
-              className="absolute -top-24 -left-24 w-80 h-80 z-0 pointer-events-none rounded-full"
-              style={{ border: '40px solid rgba(251,191,36,0.08)' }}
-            />
-
-            {/* Large circle ring — bottom right */}
-            <div
-              className="absolute -bottom-20 -right-20 w-64 h-64 z-0 pointer-events-none rounded-full"
-              style={{ border: '30px solid rgba(245,158,11,0.07)' }}
-            />
-
-            {/* Center soft amber glow */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] z-0 pointer-events-none"
-              style={{ background: 'radial-gradient(ellipse, rgba(251,191,36,0.09) 0%, transparent 70%)' }}
-            />
-
-            {/* Bottom border accent line */}
-            <div
-              className="absolute bottom-0 left-0 right-0 h-px z-0 pointer-events-none"
-              style={{
-                background: 'linear-gradient(to right, transparent, rgba(245,158,11,0.3) 40%, rgba(245,158,11,0.3) 60%, transparent)',
-              }}
+              style={{ background: 'rgba(255,251,244,0.55)' }}
             />
 
             {/* Content */}
