@@ -25,14 +25,14 @@ export const useTokenExpiry = () => {
           // Set timeout to remove token when it expires
           const timeoutId = setTimeout(() => {
             dispatch(logout());
-            window.location.href = '/admin/login';
+            window.location.href = '/admin';
           }, timeUntilExpiry);
 
           return () => clearTimeout(timeoutId);
         } else {
           // Token is already expired
           dispatch(logout());
-          window.location.href = '/admin/login';
+          window.location.href = '/admin';
         }
       } catch (error) {
         console.error('Error checking token expiry:', error);
