@@ -32,12 +32,7 @@ export const Footer = () => (
         {/* Brand */}
         <div className="md:col-span-1">
           <Link to="/" className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <Building2 size={18} className="text-white" />
-            </div>
-            <span className="font-bold text-white text-lg">
-              Shesha<span className="text-amber-400">Estates</span>
-            </span>
+            <img src="/img/Logo.png" alt="" height={50} width={50} />
           </Link>
           <p className="text-sm text-gray-400 leading-relaxed">
             Premium real estate solutions across India. Your dream home, our expertise.
