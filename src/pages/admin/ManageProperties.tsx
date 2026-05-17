@@ -109,7 +109,7 @@ function CropModal({ src, onDone, onCancel }: {
         </div>
         <div ref={containerRef} className="relative select-none sm:rounded-xl bg-gray-900 overflow-hidden touch-none flex-1 sm:flex-none">
           <img ref={imgRef} src={src} onLoad={initCrop} draggable={false}
-            className="block mx-auto w-full object-contain" style={{ maxHeight: '55vh' }}/>
+            className="block mx-auto max-w-full object-contain" style={{ maxHeight: '55vh' }}/>
           {crop && (
             <>
               <div className="absolute pointer-events-none bg-black/55" style={{ top: 0, left: 0, right: 0, height: crop.y }}/>

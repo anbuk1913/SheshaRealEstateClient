@@ -17,95 +17,69 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
   const resizeDragStart = useRef<{ mx: number; my: number; cw: number } | null>(null);
 
   const getImgBounds = useCallback(() => {
-    const img = imgRef.current;
-    const con = containerRef.current;
+    const img = imgRef.current, con = containerRef.current;
     if (!img || !con) return null;
-    const imgRect = img.getBoundingClientRect();
-    const conRect = con.getBoundingClientRect();
-    return { x: imgRect.left - conRect.left, y: imgRect.top - conRect.top, w: imgRect.width, h: imgRect.height };
+    const i = img.getBoundingClientRect(), c = con.getBoundingClientRect();
+    return { x: i.left - c.left, y: i.top - c.top, w: i.width, h: i.height };
   }, []);
 
   const clampCrop = useCallback((box: CropBox): CropBox => {
-    const bounds = getImgBounds();
-    if (!bounds) return box;
+    const b = getImgBounds(); if (!b) return box;
     let { x, y, w, h } = box;
-    w = Math.max(60, Math.min(w, bounds.w));
-    h = w / CROP_RATIO;
-    if (h > bounds.h) { h = bounds.h; w = h * CROP_RATIO; }
-    x = Math.max(bounds.x, Math.min(x, bounds.x + bounds.w - w));
-    y = Math.max(bounds.y, Math.min(y, bounds.y + bounds.h - h));
+    w = Math.max(60, Math.min(w, b.w)); h = w / CROP_RATIO;
+    if (h > b.h) { h = b.h; w = h * CROP_RATIO; }
+    x = Math.max(b.x, Math.min(x, b.x + b.w - w));
+    y = Math.max(b.y, Math.min(y, b.y + b.h - h));
     return { x, y, w, h };
   }, [getImgBounds]);
 
   const initCrop = useCallback(() => {
-    const bounds = getImgBounds();
-    if (!bounds) return;
-    let w = bounds.w * 0.9;
-    let h = w / CROP_RATIO;
-    if (h > bounds.h) { h = bounds.h * 0.9; w = h * CROP_RATIO; }
-    setCrop({ x: bounds.x + (bounds.w - w) / 2, y: bounds.y + (bounds.h - h) / 2, w, h });
+    const b = getImgBounds(); if (!b) return;
+    let w = b.w * 0.9, h = w / CROP_RATIO;
+    if (h > b.h) { h = b.h * 0.9; w = h * CROP_RATIO; }
+    setCrop({ x: b.x + (b.w - w) / 2, y: b.y + (b.h - h) / 2, w, h });
   }, [getImgBounds]);
 
-  const onMouseDown = (e: React.MouseEvent) => {
+  const onDragPointerDown = (e: React.PointerEvent) => {
     if (!crop) return;
     e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setDragging(true);
     dragStart.current = { mx: e.clientX, my: e.clientY, cx: crop.x, cy: crop.y };
   };
+  const onDragPointerMove = (e: React.PointerEvent) => {
+    if (!dragging || !dragStart.current || !crop) return;
+    setCrop(prev => prev ? clampCrop({ ...prev, x: dragStart.current!.cx + (e.clientX - dragStart.current!.mx), y: dragStart.current!.cy + (e.clientY - dragStart.current!.my) }) : prev);
+  };
+  const onDragPointerUp = () => setDragging(false);
 
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!dragging || !dragStart.current || !crop) return;
-      const dx = e.clientX - dragStart.current.mx;
-      const dy = e.clientY - dragStart.current.my;
-      setCrop(prev => prev ? clampCrop({ ...prev, x: dragStart.current!.cx + dx, y: dragStart.current!.cy + dy }) : prev);
-    };
-    const onUp = () => setDragging(false);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-  }, [dragging, crop, clampCrop]);
-
-  const onResizeDown = (e: React.MouseEvent) => {
+  const onResizePointerDown = (e: React.PointerEvent) => {
     if (!crop) return;
     e.stopPropagation(); e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setResizing(true);
     resizeDragStart.current = { mx: e.clientX, my: e.clientY, cw: crop.w };
   };
-
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!resizing || !resizeDragStart.current || !crop) return;
-      const dx = e.clientX - resizeDragStart.current.mx;
-      const newW = resizeDragStart.current.cw + dx;
-      setCrop(prev => prev ? clampCrop({ ...prev, w: newW, h: newW / CROP_RATIO }) : prev);
-    };
-    const onUp = () => setResizing(false);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-  }, [resizing, crop, clampCrop]);
+  const onResizePointerMove = (e: React.PointerEvent) => {
+    if (!resizing || !resizeDragStart.current || !crop) return;
+    const newW = resizeDragStart.current.cw + (e.clientX - resizeDragStart.current.mx);
+    setCrop(prev => prev ? clampCrop({ ...prev, w: newW, h: newW / CROP_RATIO }) : prev);
+  };
+  const onResizePointerUp = () => setResizing(false);
 
   const handleConfirm = () => {
     if (!crop || !imgRef.current) return;
-    const img    = imgRef.current;
-    const bounds = getImgBounds();
-    if (!bounds) return;
-    const scaleX = img.naturalWidth  / bounds.w;
-    const scaleY = img.naturalHeight / bounds.h;
-    const srcX = (crop.x - bounds.x) * scaleX;
-    const srcY = (crop.y - bounds.y) * scaleY;
-    const srcW = crop.w * scaleX;
-    const srcH = crop.h * scaleY;
+    const img = imgRef.current, b = getImgBounds(); if (!b) return;
+    const scaleX = img.naturalWidth / b.w, scaleY = img.naturalHeight / b.h;
+    const srcX = (crop.x - b.x) * scaleX, srcY = (crop.y - b.y) * scaleY;
+    const srcW = crop.w * scaleX, srcH = crop.h * scaleY;
     const canvas = document.createElement('canvas');
-    canvas.width  = Math.round(srcW);
-    canvas.height = Math.round(srcH);
+    canvas.width = Math.round(srcW); canvas.height = Math.round(srcH);
     canvas.getContext('2d')!.drawImage(img, Math.round(srcX), Math.round(srcY), Math.round(srcW), Math.round(srcH), 0, 0, canvas.width, canvas.height);
     canvas.toBlob(blob => { if (blob) onDone(blob); }, 'image/jpeg', 0.92);
   };
 
   return (
-    // ── Full-screen on mobile, centered card on sm+ ──
     <div className="fixed inset-0 bg-black/70 z-[60] flex flex-col items-center justify-center p-0 sm:p-4">
       <div className="bg-white sm:rounded-2xl p-4 shadow-2xl w-full sm:max-w-2xl h-full sm:h-auto flex flex-col">
         <div className="flex items-center justify-between mb-3 shrink-0">
@@ -116,28 +90,26 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
           <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={15} /></button>
         </div>
 
-        {/* Image container grows to fill available space on mobile */}
-        <div ref={containerRef} className="relative select-none rounded-xl bg-gray-900 overflow-hidden flex-1 sm:flex-none">
+        {/* Container wraps tightly around image — no blank space */}
+        <div ref={containerRef} className="relative select-none sm:rounded-xl bg-gray-900 overflow-hidden touch-none flex justify-center">
           <img
             ref={imgRef}
             src={src}
             onLoad={initCrop}
             draggable={false}
-            className="block mx-auto h-full sm:h-auto w-full object-contain"
+            className="block max-w-full h-auto"
             style={{ maxHeight: '55vh' }}
           />
-
           {crop && (
             <>
               <div className="absolute pointer-events-none bg-black/55" style={{ top: 0, left: 0, right: 0, height: crop.y }} />
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y + crop.h, left: 0, right: 0, bottom: 0 }} />
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y, left: 0, width: crop.x, height: crop.h }} />
               <div className="absolute pointer-events-none bg-black/55" style={{ top: crop.y, left: crop.x + crop.w, right: 0, height: crop.h }} />
-
               <div
-                onMouseDown={onMouseDown}
-                className="absolute border-2 border-white"
-                style={{ left: crop.x, top: crop.y, width: crop.w, height: crop.h, cursor: 'move' }}
+                onPointerDown={onDragPointerDown} onPointerMove={onDragPointerMove} onPointerUp={onDragPointerUp}
+                className="absolute border-2 border-white touch-none"
+                style={{ left: crop.x, top: crop.y, width: crop.w, height: crop.h, cursor: dragging ? 'grabbing' : 'grab' }}
               >
                 {[1/3, 2/3].map(f => (
                   <div key={f} className="absolute inset-0 pointer-events-none">
@@ -146,11 +118,11 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
                   </div>
                 ))}
                 {['top-0 left-0 border-t-2 border-l-2','top-0 right-0 border-t-2 border-r-2','bottom-0 left-0 border-b-2 border-l-2','bottom-0 right-0 border-b-2 border-r-2'].map((cls, i) => (
-                  <div key={i} className={`absolute w-4 h-4 border-amber-400 ${cls} -m-0.5`} />
+                  <div key={i} className={`absolute w-5 h-5 border-amber-400 ${cls} -m-0.5`} />
                 ))}
                 <div
-                  onMouseDown={onResizeDown}
-                  className="absolute bottom-0 right-0 w-6 h-6 bg-amber-400 rounded-tl-md cursor-se-resize flex items-center justify-center"
+                  onPointerDown={onResizePointerDown} onPointerMove={onResizePointerMove} onPointerUp={onResizePointerUp}
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-amber-400 rounded-tl-md cursor-se-resize flex items-center justify-center touch-none"
                   style={{ marginBottom: -2, marginRight: -2 }}
                 >
                   <svg width="8" height="8" viewBox="0 0 8 8"><path d="M1 7L7 1M4 7L7 4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
@@ -160,7 +132,7 @@ function CropModal({ src, onDone, onCancel }: { src: string; onDone: (blob: Blob
           )}
         </div>
 
-        <div className="flex gap-3 justify-end mt-4 shrink-0">
+        <div className="flex gap-3 mt-4 shrink-0">
           <button onClick={onCancel} className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50">Cancel</button>
           <button onClick={handleConfirm} className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-xl flex items-center justify-center gap-1.5">
             <Check size={14}/> Apply Crop

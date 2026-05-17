@@ -51,7 +51,7 @@ export const BlogCard = ({ blog }: Props) => (
         <span className="flex items-center gap-1">
           <Calendar size={11} /> {new Date(blog.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
         </span>
-        <span>· {blog.author}</span>
+        {/* <span>· {blog.author}</span> */}
       </div>
     </div>
   </Link>
