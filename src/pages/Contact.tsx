@@ -10,7 +10,7 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ show: boolean; message: string; subText?: string; type: 'success' | 'error' }>({
-    show: true,
+    show: false,
     message: '',
     type: 'success',
   });
