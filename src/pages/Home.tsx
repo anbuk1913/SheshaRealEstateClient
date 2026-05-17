@@ -21,7 +21,7 @@ const stats = [
 ];
 
 const radialPatternStyle: React.CSSProperties = {
-  backgroundImage: 'repeating-radial-gradient(#e2d1d1 50%, #e7d2d2ee 70%, #f5c7a1 95%)',
+  backgroundImage: 'repeating-radial-gradient(#e2d1d1 50%, #e7d2d2ee 70%, #f2d2b8 25%)',
   backgroundSize: '50px 50px',
 };
 
@@ -43,7 +43,7 @@ export default function Home() {
         <HeroSection />
 
         {/* ── Stats ── */}
-        <section className="border-b border-gray-100 py-8" style={{ background: 'rgba(196, 199, 245, 0.37)' }}>
+        <section className="border-b border-gray-100 py-8" style={{ background: 'rgba(238, 240, 255, 0.37)' }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map(({ label, value, icon: Icon }) => (
               <div key={label} className="flex flex-col items-center text-center gap-2">
