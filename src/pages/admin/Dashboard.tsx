@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import { logout, loginAsync } from '../../features/auth/authSlice';
 import { useTokenExpiry } from '../../hooks/useTokenExpiry';
-import { Building2, LayoutDashboard, Newspaper, Settings, LogOut, Menu, X, MapPin, Tag, Home } from 'lucide-react'; // ← add MapPin, Tag
+import { Building2, LayoutDashboard, Newspaper, Settings, LogOut, Menu, X, MapPin, Tag, Home, Mail } from 'lucide-react'; // ← add Mail
 
 const navItems = [
   { to: '/admin',            label: 'Dashboard',  icon: LayoutDashboard },
@@ -12,6 +12,7 @@ const navItems = [
   { to: '/admin/blogs',      label: 'Blogs',      icon: Newspaper },
   { to: '/admin/locations',  label: 'Locations',  icon: MapPin },   // ← new
   { to: '/admin/categories', label: 'Categories', icon: Tag },       // ← new
+  { to: '/admin/contacts',   label: 'Contacts',   icon: Mail },      // ← new
   { to: '/admin/content',    label: 'Content',    icon: Settings },
 ];
 
@@ -145,6 +146,7 @@ export default function Dashboard() {
             { label: 'Blogs',      to: '/admin/blogs',      icon: Newspaper, color: 'bg-blue-50 text-blue-600' },
             { label: 'Locations',  to: '/admin/locations',  icon: MapPin,    color: 'bg-rose-50 text-rose-600' },    // ← new
             { label: 'Categories', to: '/admin/categories', icon: Tag,       color: 'bg-violet-50 text-violet-600' },// ← new
+            { label: 'Contacts',   to: '/admin/contacts',   icon: Mail,      color: 'bg-green-50 text-green-600' },  // ← new
             { label: 'Content',    to: '/admin/content',    icon: Settings,  color: 'bg-emerald-50 text-emerald-600' },
           ].map(({ label, to, icon: Icon, color }) => (
             <Link key={to} to={to} className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-amber-200 hover:shadow-sm transition-all flex items-center gap-4">
