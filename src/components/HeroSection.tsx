@@ -12,7 +12,7 @@ export const HeroSection = () => {
   return (
     <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
       <img
-        src={'/Banner-Desktop.jpeg'}
+        src={'/Banner-Desktop.avif'}
         alt="Hero"
         className="absolute inset-0 w-full h-full object-cover"
       />
