@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../app/store';
+import useSeo from '../hooks/useSeo';
 import { fetchProperties, setFilters } from '../features/properties/propertySlice';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -26,6 +27,11 @@ export default function Properties() {
   useEffect(() => {
     dispatch(fetchProperties({ ...filters, page: pagination.page }));
   }, [filters, pagination.page, dispatch]);
+
+  useSeo({
+    title: 'Properties for Sale & Rent | Shesha Real Estate Solutions',
+    description: 'Explore available properties for sale and rent with Shesha Real Estate Solutions. Filter by location, status, and search keywords to find the ideal home or investment.',
+  });
 
   const changePage = (p: number) => {
     dispatch(fetchProperties({ ...filters, page: p }));

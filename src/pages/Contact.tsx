@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
+import useSeo from '../hooks/useSeo';
 import Toast from '../components/Toast';
 import { Mail, Phone, MapPin, Send, Clock } from 'lucide-react';
 import api from '../utils/axios';
@@ -8,6 +9,11 @@ import api from '../utils/axios';
 export default function Contact() {
   const [form, setForm]       = useState({ name: '', email: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+
+  useSeo({
+    title: 'Contact Shesha Real Estate Solutions | Get Property Help',
+    description: 'Contact Shesha Real Estate Solution for property enquiries, plot booking assistance, and investment guidance in Chennai. Our team is ready to answer your questions.',
+  });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ show: boolean; message: string; subText?: string; type: 'success' | 'error' }>({
     show: false,

@@ -154,7 +154,7 @@ function CropModal({ src, onDone, onCancel }: {
 
 // ─── Empty form state ─────────────────────────────────────────────────────────
 const emptyForm = () => ({
-  title: '', description: '', price: '', location: '', category: '',
+  title: '', slug: '', description: '', price: '', location: '', category: '',
   status: 'available', bedrooms: '', bathrooms: '', area: '',
   featured: false, isNewProject: false, amenities: '',
 });
@@ -199,7 +199,7 @@ export default function ManageProperties() {
 
   const openEdit = (p: any) => {
     setForm({
-      title: p.title ?? '', description: p.description ?? '',
+      title: p.title ?? '', slug: p.slug ?? '', description: p.description ?? '',
       price: p.price ?? '', location: p.location?._id ?? p.location ?? '',
       category: p.category?._id ?? p.category ?? '',
       status: p.status ?? 'available',
@@ -318,8 +318,19 @@ export default function ManageProperties() {
                 {/* Title */}
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1 block">Title</label>
-                  <input required value={form.title} onChange={e => setForm(f => ({...f, title: e.target.value}))}
+                  <input required value={form.title} onChange={e => {
+                    const title = e.target.value;
+                    const slug = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+                    setForm(f => ({...f, title, slug}));
+                  }}
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="Property title"/>
+                </div>
+
+                {/* Slug */}
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Slug (URL-friendly)</label>
+                  <input required value={form.slug} onChange={e => setForm(f => ({...f, slug: e.target.value.toLowerCase().replace(/[^\w-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')}))} 
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-400" placeholder="auto-generated-slug"/>
                 </div>
 
                 {/* Description */}

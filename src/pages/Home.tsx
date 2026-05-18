@@ -4,6 +4,7 @@ import { AppDispatch, RootState } from '../app/store';
 import { fetchFeatured } from '../features/properties/propertySlice';
 import { fetchAllContent } from '../features/content/contentSlice';
 import { fetchBlogs } from '../features/blog/blogSlice';
+import useSeo from '../hooks/useSeo';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { HeroSection } from '../components/HeroSection';
@@ -29,6 +30,11 @@ export default function Home() {
   const dispatch = useDispatch<AppDispatch>();
   const { featured, loading } = useSelector((s: RootState) => s.properties);
   const { items: blogs }      = useSelector((s: RootState) => s.blogs);
+
+  useSeo({
+    title: 'Shesha Real Estate Solutions | Premium Properties in India',
+    description: 'Find premium residential and investment properties across India with Shesha Real Estate Solutions. Browse featured listings, market insights, and contact our expert team.',
+  });
 
   useEffect(() => {
     dispatch(fetchFeatured());

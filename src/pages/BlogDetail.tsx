@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
+import useSeo from '../hooks/useSeo';
 import api from '../utils/axios';
 
 export default function BlogDetail() {
@@ -10,6 +11,14 @@ export default function BlogDetail() {
   const [blog, setBlog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useSeo({
+    title: blog ? `${blog.title} | Shesha Real Estate Solutions` : 'Blog Article | Shesha Real Estate Solutions',
+    description: blog
+      ? blog.excerpt || `${blog.content?.replace(/\s+/g, ' ').trim().slice(0, 150)}${blog.content?.length > 150 ? '...' : ''}`
+      : 'Read the latest blog articles from Shesha Real Estate Solutions on real estate insights, market trends, and buying tips.',
+    image: blog?.coverImage ? `${import.meta.env.VITE_BASE_URL}${blog.coverImage}` : undefined,
+  });
 
   useEffect(() => {
     if (!slug) return;
@@ -95,6 +104,10 @@ export default function BlogDetail() {
                 src={`${import.meta.env.VITE_BASE_URL}${blog.coverImage}`}
                 alt={blog.title}
                 className="w-full h-full object-cover"
+                      onError={(e) => {
+                  e.currentTarget.src = '/blog_default.jpeg';
+                }}
+                loading="lazy"
               />
             </div>
           )}

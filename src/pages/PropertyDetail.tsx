@@ -3,22 +3,32 @@ import { useParams, Link } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { ImageSlider } from '../components/ImageSlider';
+import useSeo from '../hooks/useSeo';
 import api from '../utils/axios';
 import { MapPin, BedDouble, Bath, Maximize2, ArrowLeft, Phone, Mail } from 'lucide-react';
 
 export default function PropertyDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
 
+  useSeo({
+    title: property ? `${property.title} | Shesha Real Estate Solutions` : 'Property Details | Shesha Real Estate Solutions',
+    description: property
+      ? `${property.description?.replace(/\s+/g, ' ').trim().slice(0, 150)}${property.description?.length > 150 ? '...' : ''}`
+      : 'View detailed property information including location, amenities and price with Shesha Real Estate Solutions.',
+    image: property?.images?.[0] ? `${import.meta.env.VITE_BASE_URL}${property.images[0]}` : undefined,
+    url: window.location.href,
+  });
+
   useEffect(() => {
-    if (!id) return;
+    if (!slug) return;
     setLoading(true);
-    (api.get(`/properties/${id}`) as any)
+    (api.get(`/properties/${slug}`) as any)
       .then((res: any) => { setProperty(res.data); setLoading(false); })
       .catch(() => { setError('Property not found.'); setLoading(false); });
-  }, [id]);
+  }, [slug]);
 
   function renderDescription(text: string) {
     return text.split('\n').map((line, i) => {

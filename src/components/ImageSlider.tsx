@@ -28,6 +28,10 @@ export const ImageSlider = ({ images, alt = 'Property image' }: Props) => {
           key={i}
           src={`${import.meta.env.VITE_BASE_URL}${src}`}
           alt={`${alt} ${i + 1}`}
+          onError={(e) => {
+            e.currentTarget.src = '/blog_default.jpeg';
+          }}
+          loading="lazy"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === current ? 'opacity-100' : 'opacity-0'}`}
         />
       ))}

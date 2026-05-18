@@ -1,6 +1,7 @@
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { Shield, Award, Target, MapPin, Phone, Mail, CheckCircle } from 'lucide-react';
+import useSeo from '../hooks/useSeo';
 
 const values = [
   { icon: Shield,      title: 'Integrity',  desc: 'Transparent dealings and honest advice - always.' },
@@ -15,6 +16,11 @@ const K = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function About() {
+  useSeo({
+    title: 'About Shesha Real Estate Solutions | Trusted Chennai Plot Investment',
+    description: 'Learn about Shesha Real Estate Solution, our founder, and how we help buyers invest in DTCP and CMDA approved plots across Chennai with transparent guidance and verified listings.',
+  });
+
   return (
     <>
       <style>{`

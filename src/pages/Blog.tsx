@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../app/store';
+import useSeo from '../hooks/useSeo';
 import { fetchBlogs } from '../features/blog/blogSlice';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -15,6 +16,11 @@ const radialPatternStyle: React.CSSProperties = {
 export default function Blog() {
   const dispatch = useDispatch<AppDispatch>();
   const { items: blogs, loading } = useSelector((s: RootState) => s.blogs);
+
+  useSeo({
+    title: 'Real Estate Blog | Shesha Real Estate Solutions',
+    description: 'Read expert real estate insights, market updates, and property buying tips from Shesha Real Estate Solutions to make smarter investment decisions.',
+  });
 
   useEffect(() => { dispatch(fetchBlogs()); }, [dispatch]);
 
