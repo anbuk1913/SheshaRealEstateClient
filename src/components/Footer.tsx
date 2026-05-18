@@ -5,17 +5,17 @@ import { FaWhatsapp } from "react-icons/fa";
 const SOCIAL_LINKS = [
   {
     Icon: Facebook,
-    href: 'https://www.facebook.com',
+    href: 'https://www.facebook.com/shesharealestatesolutions',
     label: 'Facebook',
   },
   {
     Icon: Instagram,
-    href: 'https://www.instagram.com',
+    href: 'https://www.instagram.com/shesharealestatesolutions',
     label: 'Instagram',
   },
   {
     Icon: Twitter,
-    href: 'https://www.x.com',
+    href: 'https://www.instagram.com/shesharealestatesolutions',
     label: 'Twitter',
   },
   {
