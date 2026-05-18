@@ -31,34 +31,38 @@ export default function PropertyDetail() {
   }, [slug]);
 
   function renderDescription(text: string) {
-    return text.split('\n').map((line, i) => {
-      if (line.trim() === '') {
-        return <span key={i} className="block h-2" />;
-      }
+  // Captures: *bold*, "straight", 'straight', "curly double", 'curly single'
+  const HIGHLIGHT_RE = /(\*[^*]+\*|"[^"]+"|'[^']+'|"[^"]+"|'[^']+'|“[^”]+”|‘[^’]+’)/g;
+  const IS_HIGHLIGHT = /^(\*[^*]+\*|"[^"]+"|'[^']+'|"[^"]+"|'[^']+'|“[^”]+”|‘[^’]+’)$/;
 
-      const parts = line.split(/(\*[^*]+\*|"[^"]+"|'[^']+')/g);
-      const hasStarHighlight = parts.some(p => /^\*[^*]+\*$/.test(p));
+  return text.split('\n').map((line, i) => {
+    if (line.trim() === '') {
+      return <span key={i} className="block h-2" />;
+    }
 
-      return (
-        <span key={i} className={`block ${hasStarHighlight ? 'flex items-start gap-2' : ''}`}>
-          {hasStarHighlight && (
-            <span className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0 inline-block" />
+    const parts = line.split(HIGHLIGHT_RE);
+    const hasStarHighlight = parts.some(p => /^\*[^*]+\*$/.test(p));
+
+    return (
+      <span key={i} className={`block ${hasStarHighlight ? 'flex items-start gap-2' : ''}`}>
+        {hasStarHighlight && (
+          <span className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0 inline-block" />
+        )}
+        <span>
+          {parts.map((part, j) =>
+            IS_HIGHLIGHT.test(part) ? (
+              <strong key={j} className="font-semibold text-gray-900">
+                {part.slice(1, -1)}
+              </strong>
+            ) : (
+              <span key={j}>{part}</span>
+            )
           )}
-          <span>
-            {parts.map((part, j) =>
-              /^(\*[^*]+\*|"[^"]+"|'[^']+')$/.test(part) ? (
-                <strong key={j} className="font-semibold text-gray-900">
-                  {part.slice(1, -1)}
-                </strong>
-              ) : (
-                <span key={j}>{part}</span>
-              )
-            )}
-          </span>
         </span>
-      );
-    });
-  }
+      </span>
+    );
+  });
+}
 
 
 
