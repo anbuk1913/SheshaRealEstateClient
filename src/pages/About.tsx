@@ -152,12 +152,12 @@ export default function About() {
                     <div style={{ position:'absolute', top:-40, left:-40, width:140, height:140, borderRadius:'50%', background:'rgba(255,255,255,0.06)' }} />
                     <div style={{ position:'absolute', bottom:-30, right:-30, width:110, height:110, borderRadius:'50%', background:'rgba(255,255,255,0.06)' }} />
 
-                    <img src="\img\shesha_founder.png" alt="Ravi Shesha" className="rounded-2xl" />
-                    <h3 className="font-cinzel text-xl font-bold mb-1 relative">Ravi Shesha</h3>
+                    <img src="\img\shesha_founder.png" alt="Shesha" className="rounded-2xl" />
+                    <h3 className="font-cinzel text-xl font-bold mb-1 relative">Shesha</h3>
                     <p className="text-amber-100 text-sm mb-3 relative" style={{ fontWeight:300 }}>Founder</p>
                     <div className="w-10 h-px bg-white/40 mx-auto mb-3" />
                     <p className="text-amber-100 text-xs leading-snug relative" style={{ fontWeight:300 }}>
-                      Vice President – Rahaa Associates
+                       Associate Vice President – Rahaa Associates
                     </p>
                   </div>
 
@@ -171,7 +171,7 @@ export default function About() {
                         padding:'3px 12px', borderRadius:'999px',
                         fontFamily:"'DM Sans',sans-serif"
                       }}>
-                        Vice President – Rahaa Associates
+                        Associate Vice President – Rahaa Associates
                       </span>
                     </div>
 
@@ -222,7 +222,7 @@ export default function About() {
                   </p>
                   <p>
                     Our leadership brings strong industry experience, currently serving as{' '}
-                    <K>Vice President at Rahaa Associates</K>. With deep market knowledge
+                    <K>Associate Vice President at Rahaa Associates</K>. With deep market knowledge
                     and professional guidance, we assist clients in selecting the right plots
                     based on <K>location growth</K>, budget, and future value.
                   </p>
