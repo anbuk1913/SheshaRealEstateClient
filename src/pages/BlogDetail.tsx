@@ -5,6 +5,7 @@ import { Footer } from '../components/Footer';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
 import useSeo from '../hooks/useSeo';
 import api from '../utils/axios';
+import { Analytics } from '@vercel/analytics/react';
 
 export default function BlogDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -64,6 +65,7 @@ export default function BlogDetail() {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
+          <Analytics />
           <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
         </main>
         <Footer />
@@ -87,6 +89,7 @@ export default function BlogDetail() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <Analytics />
       <main className="flex-1 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Button */}

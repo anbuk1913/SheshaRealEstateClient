@@ -2,6 +2,7 @@ import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { Shield, Award, Target, MapPin, Phone, Mail, CheckCircle } from 'lucide-react';
 import useSeo from '../hooks/useSeo';
+import { Analytics } from '@vercel/analytics/react';
 
 const values = [
   { icon: Shield,      title: 'Integrity',  desc: 'Transparent dealings and honest advice - always.' },
@@ -23,6 +24,7 @@ export default function About() {
 
   return (
     <>
+    <Analytics />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Cinzel:wght@600;700&display=swap');
 

@@ -13,6 +13,7 @@ import { BlogCard } from '../components/BlogCard';
 import { PropertyCardSkeleton } from '../components/Skeleton';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Award, Users, TrendingUp } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 
 const stats = [
   { label: 'Properties Listed', value: '2,000+', icon: TrendingUp },
@@ -44,6 +45,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Analytics />
       <Navbar />
       <main className="flex-1">
         <HeroSection />

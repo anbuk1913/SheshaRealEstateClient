@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { store } from './src/app/store';
-import { Analytics } from "@vercel/analytics/react"
 
 import Home             from './src/pages/Home';
 import Properties       from './src/pages/Properties';
@@ -27,7 +26,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
-          <Analytics />
           {/* Public */}
           <Route path="/"                 element={<Home />} />
           <Route path="/properties"       element={<Properties />} />

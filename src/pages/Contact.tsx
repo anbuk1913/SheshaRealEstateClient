@@ -5,6 +5,7 @@ import useSeo from '../hooks/useSeo';
 import Toast from '../components/Toast';
 import { Mail, Phone, MapPin, Send, Clock } from 'lucide-react';
 import api from '../utils/axios';
+import { Analytics } from '@vercel/analytics/react';
 
 export default function Contact() {
   const [form, setForm]       = useState({ name: '', email: '', phone: '', message: '' });
@@ -54,6 +55,7 @@ export default function Contact() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <Analytics />
       {toast.show && (
         <div className="fixed top-4 right-4 z-50">
           <Toast
