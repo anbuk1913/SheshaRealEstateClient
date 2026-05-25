@@ -8,6 +8,7 @@ import { Footer } from '../components/Footer';
 import { BlogCard } from '../components/BlogCard';
 import { FileText } from 'lucide-react';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const radialPatternStyle: React.CSSProperties = {
   backgroundImage: 'repeating-radial-gradient(#e2d1d1 50%, #e7d2d2ee 70%, #f2d2b8 25%)',
@@ -28,6 +29,7 @@ export default function Blog() {
   return (
     <div className="min-h-screen flex flex-col">
       <Analytics />
+      <SpeedInsights />
       <Navbar />
       <main className="flex-1 bg-gray-50">
         <div className="border-b border-gray-100" style={radialPatternStyle}>

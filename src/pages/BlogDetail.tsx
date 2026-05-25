@@ -6,6 +6,7 @@ import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
 import useSeo from '../hooks/useSeo';
 import api from '../utils/axios';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 export default function BlogDetail() {
   const { slug } = useParams<{ slug: string }>();

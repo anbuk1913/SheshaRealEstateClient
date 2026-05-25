@@ -7,6 +7,7 @@ import useSeo from '../hooks/useSeo';
 import api from '../utils/axios';
 import { MapPin, BedDouble, Bath, Maximize2, ArrowLeft, Phone, Mail } from 'lucide-react';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 export default function PropertyDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -47,6 +48,7 @@ export default function PropertyDetail() {
     return (
       <span key={i} className={`block ${hasStarHighlight ? 'flex items-start gap-2' : ''}`}>
         <Analytics />
+        <SpeedInsights />
         {hasStarHighlight && (
           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0 inline-block" />
         )}

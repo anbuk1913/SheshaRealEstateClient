@@ -11,6 +11,7 @@ import { PropertyCardSkeleton } from '../components/Skeleton';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { useDebounce } from '../hooks/useDebounce';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const statusOptions = ['', 'available', 'sold', 'rented'];
 
@@ -43,6 +44,7 @@ export default function Properties() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <Analytics />
+      <SpeedInsights />
       <main className="flex-1 bg-gray-50">
         {/* Header */}
         <div className="bg-white border-b border-gray-100">
